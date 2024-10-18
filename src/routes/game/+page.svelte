@@ -218,7 +218,7 @@
 
 			<div class="add-player-info">
 				<div>
-					<label for="playerName">Player name:</label>
+					<label for="playerName">Player Name:</label>
 					<input type="text" bind:value={playerName} placeholder="What is the player name?" />
 				</div>
 

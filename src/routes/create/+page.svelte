@@ -42,7 +42,7 @@
 			<input
 				type="text"
 				bind:value={playerName}
-				placeholder="Player name"
+				placeholder="Player Name"
 				on:keydown={(e) =>
 					e.key === 'Enter' &&
 					canAddPlayer(playerName) &&

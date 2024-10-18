@@ -25,7 +25,9 @@
 </script>
 
 <main class="profile" class:disable={player.custom > 0}>
-	<h2>{player.player}</h2>
+	<h2 class:rainbow={['bouns', 'fab', 'fabien'].includes(player?.player?.toLowerCase?.())}>
+		{player.player}
+	</h2>
 	<h3>Bids</h3>
 	<div class="bids">
 		<button class="selected" on:click={() => (player.betTurn = 0)}>{0}</button>
@@ -152,6 +154,35 @@
 		color: var(--primary-950);
 		border-radius: 10px;
 		padding: 10px 10px 20px 10px;
+
+		.rainbow {
+			background: linear-gradient(
+				90deg,
+				#ff0000,
+				#ff7f00,
+				#ffff00,
+				#00ff00,
+				#0000ff,
+				#4b0082,
+				#8b00ff
+			);
+			background-size: 600% 600%;
+			animation: rainbow 4s linear infinite;
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+
+			@keyframes rainbow {
+				0% {
+					background-position: 0% 82%;
+				}
+				50% {
+					background-position: 100% 19%;
+				}
+				100% {
+					background-position: 0% 82%;
+				}
+			}
+		}
 
 		h2 {
 			text-align: center;
