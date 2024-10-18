@@ -1,9 +1,14 @@
 <script>
 	import { Toaster, toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 
 	let players = [];
 	let playerName = '';
+
+	onMount(() => {
+		players = JSON.parse(localStorage.getItem('players')) || [];
+	});
 
 	function canAddPlayer(name) {
 		if (name === '') {
@@ -21,7 +26,6 @@
 </script>
 
 <h1>Create</h1>
-<Toaster position="top-center" richColors />
 
 <div class="main-container">
 	<div class="players">
@@ -51,7 +55,10 @@
 				disabled={!playerName}
 				on:click={() => {
 					if (canAddPlayer(playerName)) {
-						players = [...players, playerName];
+						let name = playerName.trim();
+						name = name.charAt(0).toUpperCase() + name.slice(1);
+
+						players = [...players, name];
 						playerName = '';
 					}
 				}}>Add</button

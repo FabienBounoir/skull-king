@@ -1,4 +1,10 @@
 <script>
+	import Bet from '$lib/icons/Bet.svelte';
+	import Deal from '$lib/icons/Deal.svelte';
+	import Mermaid from '$lib/icons/Mermaid.svelte';
+	import Skull from '$lib/icons/Skull.svelte';
+	import Sword from '$lib/icons/Sword.svelte';
+
 	/**
 	 * Représente un joueur dans un nouveau tour.
 	 * @typedef {Object} PlayerRound
@@ -18,7 +24,7 @@
 	export let index = 0;
 </script>
 
-<main class="profile">
+<main class="profile" class:disable={player.custom > 0}>
 	<h2>{player.player}</h2>
 	<h3>Bids</h3>
 	<div class="bids">
@@ -50,7 +56,7 @@
 				}
 			}}
 		>
-			P
+			<Sword />
 
 			<div class="tooltip">
 				<span class="tooltiptext">
@@ -67,7 +73,7 @@
 				}
 			}}
 		>
-			Sir
+			<Mermaid />
 
 			<div class="tooltip">
 				<span class="tooltiptext">{player.captureSirene}</span>
@@ -83,7 +89,7 @@
 				}
 			}}
 		>
-			SKU
+			<Skull />
 
 			<div class="tooltip">
 				<span class="tooltiptext">{player.captureSkullKing}</span>
@@ -91,6 +97,7 @@
 		</button>
 
 		<button
+			style="font-size: 1.2rem"
 			on:click={() => {
 				player.bonus += 10;
 
@@ -113,7 +120,7 @@
 				}
 			}}
 		>
-			Ras
+			<Bet />
 
 			<div class="tooltip">
 				<span class="tooltiptext">{player.rascal}</span>
@@ -128,7 +135,7 @@
 				}
 			}}
 		>
-			Ali
+			<Deal />
 
 			<div class="tooltip">
 				<span class="tooltiptext">{player.alliance}</span>
@@ -151,6 +158,11 @@
 			text-transform: uppercase;
 			margin: 0;
 		}
+
+		&.disable {
+			pointer-events: none;
+			filter: grayscale(1);
+		}
 	}
 
 	.bids {
@@ -167,7 +179,7 @@
 		background-color: #ffffff;
 		color: var(--primary-950);
 		border: none;
-		font-size: 1rem;
+		font-weight: bold;
 		width: 30px; /* Ajuste la largeur */
 		height: 30px;
 	}
@@ -185,11 +197,15 @@
 	}
 
 	.bonus button {
-		width: 30px;
-		height: 30px;
-		border-radius: 5px;
+		width: 50px;
+		height: 50px;
+		border-radius: 8px;
 		border: none;
 		position: relative;
+		font-weight: bold;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.bonus button .tooltip {
@@ -200,5 +216,10 @@
 		background-color: white;
 		width: 20px;
 		height: 20px;
+		font-size: 0.8rem;
+		font-weight: normal;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
 </style>

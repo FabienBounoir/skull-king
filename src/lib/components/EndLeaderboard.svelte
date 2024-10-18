@@ -21,6 +21,11 @@
 					scores.set(player.player, 0);
 				}
 
+				if (player.custom > 0) {
+					scores.set(player.player, scores.get(player.player) + player.custom);
+					continue;
+				}
+
 				let score = 0;
 				// player lose the bet
 				if (player.winTurn != player.betTurn) {
@@ -80,7 +85,6 @@
 	};
 
 	onMount(() => {
-		console.error('    > ON MOUNT', rounds);
 		calculateScores();
 	});
 </script>
@@ -98,9 +102,9 @@
 				class:bold={index < 3}
 			>
 				<p>
-					{top[index] || index + 1} - {player}
+					<span>{top[index] || index + 1}</span>{player}
 				</p>
-				<p>{score}</p>
+				<p class:negative={score < 0}>{score} pts</p>
 			</div>
 		{/each}
 	</div>
@@ -133,6 +137,21 @@
 
 	.end-leaderboard p {
 		margin: 0;
+		display: flex;
+		flex-direction: row;
+		gap: 5px;
+
+		&.negative {
+			color: red;
+		}
+
+		span {
+			width: 30px;
+			align-items: center;
+			display: flex;
+			justify-content: center;
+			font-weight: bold;
+		}
 	}
 
 	.end-leaderboard .players {

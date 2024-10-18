@@ -1,8 +1,17 @@
+<script>
+	import { toast } from 'svelte-sonner';
+</script>
+
 <main class="home">
 	<h1>Skull King</h1>
 	<div class="main-menu">
 		<a href="/create">Create new game</a>
-		<a href="/">History</a>
+		<a
+			href="/"
+			on:click={() => {
+				toast.info('History is not implemented yet');
+			}}>History</a
+		>
 	</div>
 </main>
 

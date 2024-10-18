@@ -4,9 +4,9 @@
 	export let players = [];
 	export let rounds = [];
 	export let selectedRound = 0;
+	export let actualScore = [];
 
 	let scores = new Map();
-	let scoreArray = [];
 	let bestScore = 0;
 
 	const calculateScores = () => {
@@ -20,7 +20,7 @@
 			}
 		}
 
-		scoreArray = Array.from(scores.entries());
+		actualScore = Array.from(scores.entries());
 
 		for (let i = 0; i < rounds.length; i++) {
 			if (i >= selectedRound) {
@@ -32,6 +32,11 @@
 				console.log('    > PLAYER', player);
 				if (!scores.has(player.player)) {
 					scores.set(player.player, 0);
+				}
+
+				if (player.custom > 0) {
+					scores.set(player.player, scores.get(player.player) + player.custom);
+					continue;
 				}
 
 				let score = 0;
@@ -96,7 +101,7 @@
 			console.log('    > i et selectedRound', i, selectedRound);
 		}
 
-		scoreArray = Array.from(scores.entries());
+		actualScore = Array.from(scores.entries());
 		setBestScore();
 	};
 
@@ -113,7 +118,7 @@
 <main class="leaderboard">
 	<h1>Score Board</h1>
 	<div class="players">
-		{#each scoreArray as [player, score], index}
+		{#each actualScore as [player, score], index}
 			<div class="player" class:selected={index == selectedRound % players.length}>
 				<p>{bestScore == score ? '🏆 ' : ''}{player}: {score}</p>
 			</div>
@@ -172,5 +177,16 @@
 		font-weight: bold;
 		color: white;
 		font-weight: bold;
+		animation: blinker 1s linear alternate infinite;
+	}
+
+	@keyframes blinker {
+		20% {
+			filter: brightness(1.5);
+		}
+
+		50% {
+			filter: brightness(1);
+		}
 	}
 </style>

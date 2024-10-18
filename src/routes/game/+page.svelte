@@ -4,6 +4,7 @@
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import PlayerProfile from '$lib/components/PlayerProfile.svelte';
 	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	/**
 	 * Représente un joueur dans un nouveau tour.
@@ -25,6 +26,15 @@
 	let status = 'INIT';
 
 	let selectedRound = 0;
+
+	let playerName = '';
+	let startWith = 'ZERO';
+
+	let customNewScore = 0;
+
+	let actualScore = [];
+
+	let positionNewUser = 0;
 
 	onMount(() => {
 		try {
@@ -58,12 +68,102 @@
 		rounds = [...rounds, newRound];
 		selectedRound = rounds.length - 1;
 	}
+
+	function getTopLowerScore() {
+		let findScore = {
+			lower: 0,
+			top: 0
+		};
+
+		for (let i = 0; i < actualScore.length; i++) {
+			let score = actualScore[i][1];
+
+			if (score < findScore.lower) {
+				findScore.lower = score;
+			}
+
+			if (score > findScore.top) {
+				findScore.top = score;
+			}
+		}
+
+		return findScore;
+	}
+
+	function addNewPlayer() {
+		if (playerName === '') {
+			toast.error('Player name cannot be empty');
+			return;
+		}
+
+		if (players.includes(playerName)) {
+			toast.warning('Player already exists');
+			return;
+		}
+
+		let manageRound = [];
+
+		let score = 0;
+
+		console.log('getTopLowerScore()', getTopLowerScore());
+
+		if (startWith == 'LOW') {
+			score = getTopLowerScore().lower;
+		} else if (startWith == 'BEST') {
+			score = getTopLowerScore().top;
+		} else if (startWith == 'MIDDLE') {
+			let findScore = getTopLowerScore();
+			let echo = findScore.top - findScore.lower;
+
+			score = findScore.lower + echo / 2;
+		} else if (startWith == 'CUSTOM') {
+			score = customNewScore;
+		}
+
+		for (let i = 0; i < rounds.length; i++) {
+			let round = rounds[i];
+			if (i == rounds.length - 2 && rounds.length > 1) {
+				round.splice(positionNewUser + 1, 0, {
+					player: playerName,
+					winTurn: 0,
+					betTurn: 0,
+					capturePirate: 0,
+					captureSirene: 0,
+					captureSkullKing: 0,
+					bonus: 0,
+					rascal: 0,
+					alliance: 0,
+					custom: score
+				});
+			} else if (i == rounds.length - 1) {
+				round.splice(positionNewUser + 1, 0, {
+					player: playerName,
+					winTurn: 0,
+					betTurn: 0,
+					capturePirate: 0,
+					captureSirene: 0,
+					captureSkullKing: 0,
+					bonus: 0,
+					rascal: 0,
+					alliance: 0
+				});
+			}
+
+			manageRound.push(round);
+		}
+
+		rounds = [...manageRound];
+		players = [...players, playerName];
+		playerName = '';
+
+		status = 'PLAY';
+	}
 </script>
 
 <main class="game-container">
 	{#if status == 'PLAY'}
 		{#key (rounds, players, selectedRound)}
-			<Leaderboard {rounds} {selectedRound} {players} />
+			<Leaderboard {rounds} {selectedRound} {players} bind:actualScore />
 		{/key}
 
 		<div class="round">
@@ -83,7 +183,7 @@
 				{/each}
 			{/if}
 		{/each}
-		<div class="round-navigation">
+		<div class="navigation">
 			{#if selectedRound < rounds.length - 1}
 				{#if selectedRound > 0}
 					<button
@@ -115,6 +215,51 @@
 	{:else if status == 'NEW_PLAYER'}
 		<div class="add-player">
 			<h1>Add New User</h1>
+
+			<div class="add-player-info">
+				<div>
+					<label for="playerName">Player name:</label>
+					<input type="text" bind:value={playerName} placeholder="What is the player name?" />
+				</div>
+
+				<div style="display: flex; flex-direction: column;" class:hidden={rounds.length < 2}>
+					<label for="playerName">It starts with how many points ?</label>
+					<select bind:value={startWith}>
+						<option value="ZERO">Zero points</option>
+						<option value="LOW">Low score</option>
+						<option value="BEST">Best score</option>
+						<option value="MIDDLE">Middle score</option>
+						<option value="CUSTOM">Custom score</option>
+					</select>
+
+					{#if startWith == 'CUSTOM'}
+						<div>
+							<input type="number" bind:value={customNewScore} placeholder="How many points?" />
+						</div>
+					{/if}
+				</div>
+			</div>
+
+			<div style="display: flex; flex-direction: column;" class="add-player-info">
+				<label for="playerName">Position in the list (after which player?)</label>
+				<select bind:value={positionNewUser} placeholder="After which player?">
+					{#each players as player, index}
+						<option value={index}>{player}</option>
+					{/each}
+				</select>
+			</div>
+
+			<div class="navigation">
+				<button style="transform: rotate(180deg); width: 20%;" on:click={() => (status = 'PLAY')}
+					>➜</button
+				>
+
+				<button
+					on:click={() => {
+						addNewPlayer();
+					}}>Add User</button
+				>
+			</div>
 		</div>
 	{/if}
 </main>
@@ -131,7 +276,7 @@
 			color: var(--primary-950);
 		}
 
-		.add-player {
+		button.add-player {
 			background-color: var(--primary-500);
 			color: var(--primary-50);
 			width: 40px;
@@ -139,6 +284,54 @@
 			border-radius: 5px;
 			border: none;
 			font-size: 1.8rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+
+	.add-player {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10vh;
+		width: 100%;
+
+		select {
+			width: 100%;
+			padding: 10px;
+			border-radius: 5px;
+			border: 1px solid var(--primary-500);
+		}
+	}
+
+	.add-player-info {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 3vh;
+
+		& > div {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			gap: 1vh;
+
+			& > div {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+			}
+		}
+
+		.hidden {
+			display: none !important;
+		}
+
+		input {
+			padding: 10px;
+			border-radius: 5px;
+			border: 1px solid var(--primary-500);
 		}
 	}
 
@@ -146,7 +339,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		margin-bottom: 70px;
+		margin-bottom: 90px;
 
 		h1 {
 			margin-bottom: 0;
@@ -154,19 +347,19 @@
 		}
 	}
 
-	.round-navigation {
+	.navigation {
 		display: flex;
 		justify-content: center;
 		gap: 10px;
 		position: fixed;
-		bottom: 10px;
+		bottom: 30px;
 		left: 50%;
 		width: 90vw;
 		transform: translateX(-50%);
 		height: 50px;
 	}
 
-	.round-navigation button {
+	.navigation button {
 		background-color: var(--primary-500);
 		color: var(--primary-50);
 		padding: 10px 20px;
