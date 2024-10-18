@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	export let players = [];
@@ -111,8 +112,7 @@
 
 	<button
 		on:click={() => {
-			localStorage.clear();
-			window.location.href = '/';
+			goto('/');
 		}}>Nouvelle partie</button
 	>
 </main>
