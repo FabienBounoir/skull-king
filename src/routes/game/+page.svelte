@@ -3,6 +3,7 @@
 	import EndLeaderboard from '$lib/components/EndLeaderboard.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import PlayerProfile from '$lib/components/PlayerProfile.svelte';
+	import RoundAnnouncement from '$lib/components/RoundAnnouncement.svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -24,22 +25,48 @@
 	let players = [];
 	let rounds = [];
 	let status = 'INIT';
-
 	let selectedRound = 0;
 
+	let alreadySave = false;
+
+	//round Announcement
+	let displayAnnouncement = false;
+
+	//to add new player info
 	let playerName = '';
 	let startWith = 'ZERO';
-
 	let customNewScore = 0;
-
 	let actualScore = [];
-
 	let positionNewUser = 0;
+
+	let totalRound = 10;
+
+	$: saveData(players, rounds, status, selectedRound);
+
+	function saveData(players, rounds, status, selectedRound) {
+		if (status == 'INIT') return;
+
+		if (status == 'END') {
+			localStorage.removeItem('rounds');
+			localStorage.removeItem('selectedRound');
+			return;
+		}
+
+		localStorage.setItem('players', JSON.stringify(players));
+		localStorage.setItem('rounds', JSON.stringify(rounds));
+		localStorage.setItem('selectedRound', selectedRound);
+	}
 
 	onMount(() => {
 		try {
 			players = JSON.parse(localStorage.getItem('players'));
-			addNewRound();
+
+			if (localStorage.getItem('rounds') && localStorage.getItem('selectedRound')) {
+				rounds = JSON.parse(localStorage.getItem('rounds'));
+				selectedRound = parseInt(localStorage.getItem('selectedRound'));
+			} else {
+				addNewRound();
+			}
 
 			status = 'PLAY';
 		} catch (e) {
@@ -50,6 +77,7 @@
 
 	function addNewRound() {
 		let newRound = [];
+		displayAnnouncement = true;
 
 		for (let player of players) {
 			newRound.push({
@@ -67,6 +95,10 @@
 
 		rounds = [...rounds, newRound];
 		selectedRound = rounds.length - 1;
+
+		setTimeout(() => {
+			displayAnnouncement = false;
+		}, 2000);
 	}
 
 	function getTopLowerScore() {
@@ -158,6 +190,12 @@
 
 		status = 'PLAY';
 	}
+
+	function scrollToTop() {
+		window.scrollTo({
+			top: 0
+		});
+	}
 </script>
 
 <main class="game-container">
@@ -167,7 +205,7 @@
 		{/key}
 
 		<div class="round">
-			<h1>Round {selectedRound + 1}</h1>
+			<h1>Round {1 + selectedRound}</h1>
 			<button
 				class="add-player"
 				on:click={() => {
@@ -200,18 +238,30 @@
 					>
 				{/if}
 				<button
+					style="font-size: 1.5rem;"
 					on:click={() => {
-						if (rounds.length < 10) {
+						if (rounds.length < totalRound) {
 							addNewRound();
+							scrollToTop();
 						} else {
 							status = 'END';
 						}
-					}}>End Round</button
+					}}
 				>
+					{#if rounds.length < 10}
+						End Round
+					{:else}
+						End Game
+					{/if}
+				</button>
 			{/if}
 		</div>
+
+		{#if displayAnnouncement}
+			<RoundAnnouncement round={rounds.length} />
+		{/if}
 	{:else if status == 'END'}
-		<EndLeaderboard {rounds} {selectedRound} {players} />
+		<EndLeaderboard {rounds} {selectedRound} {players} bind:status bind:alreadySave />
 	{:else if status == 'NEW_PLAYER'}
 		<div class="add-player">
 			<h1>Add New User</h1>
@@ -255,6 +305,7 @@
 				>
 
 				<button
+					style="font-size: 1.5rem;"
 					on:click={() => {
 						addNewPlayer();
 					}}>Add User</button
@@ -273,7 +324,7 @@
 
 		h1 {
 			margin: 0;
-			color: var(--primary-950);
+			color: var(--primary-50) !important;
 		}
 
 		button.add-player {
@@ -291,6 +342,7 @@
 	}
 
 	.add-player {
+		color: var(--primary-50);
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -303,13 +355,26 @@
 			border-radius: 5px;
 			border: 1px solid var(--primary-500);
 		}
+
+		h1 {
+			color: var(--primary-50) !important;
+		}
 	}
 
 	.add-player-info {
+		color: var(--primary-50);
 		width: 100%;
 		display: flex;
 		flex-direction: column;
 		gap: 3vh;
+
+		label {
+			font-size: 1.4rem;
+		}
+
+		* {
+			font-size: 1.2rem;
+		}
 
 		& > div {
 			display: flex;
@@ -339,7 +404,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		margin-bottom: 90px;
+		margin-bottom: 30px;
 
 		h1 {
 			margin-bottom: 0;
@@ -351,12 +416,11 @@
 		display: flex;
 		justify-content: center;
 		gap: 10px;
-		position: fixed;
-		bottom: 30px;
-		left: 50%;
-		width: 90vw;
-		transform: translateX(-50%);
-		height: 50px;
+		position: sticky;
+		bottom: 25px;
+		min-height: 50px;
+		padding: 0 2.5vw;
+		margin: 10px 0 0 0;
 	}
 
 	.navigation button {
@@ -365,6 +429,8 @@
 		padding: 10px 20px;
 		border-radius: 5px;
 		width: 100%;
+		font-size: 1.5rem;
 		border: none;
+		cursor: pointer;
 	}
 </style>

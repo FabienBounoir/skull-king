@@ -3,8 +3,8 @@
     "short_name": "Skull King",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#FFFFFF",
+    "background_color": "#231f20",
+    "theme_color": "#4b4144",
     "orientation": "portrait",
     "icons": [
         {

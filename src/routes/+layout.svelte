@@ -1,11 +1,23 @@
 <script>
 	import { Toaster } from 'svelte-sonner';
 	import '../app.scss';
+	import { onMount } from 'svelte';
+	import '@fortawesome/fontawesome-free/css/all.min.css';
 
 	let loading = true;
 	setTimeout(() => {
 		loading = false;
 	}, 2000);
+
+	onMount(() => {
+		document.addEventListener(
+			'dblclick',
+			function (event) {
+				event.preventDefault();
+			},
+			{ passive: false }
+		);
+	});
 </script>
 
 <Toaster position="top-center" richColors />
@@ -19,6 +31,12 @@
 <slot />
 
 <style lang="scss">
+	.main-container {
+		padding: 5px;
+		box-sizing: border-box;
+		// min-height: 100vh;
+	}
+
 	.loader {
 		display: flex;
 		justify-content: center;

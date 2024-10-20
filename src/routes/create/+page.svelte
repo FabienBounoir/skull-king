@@ -2,12 +2,19 @@
 	import { Toaster, toast } from 'svelte-sonner';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import AddIcon from '$lib/components/AddIcon.svelte';
 
 	let players = [];
 	let playerName = '';
 
+	let oldGameExists = false;
+
 	onMount(() => {
 		players = JSON.parse(localStorage.getItem('players')) || [];
+
+		if (localStorage.getItem('rounds')) {
+			oldGameExists = true;
+		}
 	});
 
 	function canAddPlayer(name) {
@@ -16,16 +23,41 @@
 			return false;
 		}
 
-		if (players.includes(name)) {
+		if (players.some((p) => p.toLowerCase() === name.toLowerCase())) {
 			toast.warning('Player already exists');
 			return false;
 		}
 
 		return true;
 	}
+
+	function formatName(name) {
+		return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+	}
 </script>
 
-<h1>Create</h1>
+<div
+	class="header"
+	style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
+>
+	<h1
+		on:click={() => {
+			goto('/');
+		}}
+	>
+		← Create
+	</h1>
+
+	{#if oldGameExists}
+		<button
+			on:click={() => {
+				goto('/game');
+			}}
+		>
+			Continue The Game
+		</button>
+	{/if}
+</div>
 
 <div class="main-container">
 	<div class="players">
@@ -58,16 +90,20 @@
 						let name = playerName.trim();
 						name = name.charAt(0).toUpperCase() + name.slice(1);
 
-						players = [...players, name];
+						players = [...players, formatName(name)];
 						playerName = '';
 					}
-				}}>Add</button
-			>
+				}}
+				><AddIcon />
+			</button>
 		</div>
 
 		<button
 			disabled={players.length < 2 || playerName}
 			on:click={() => {
+				localStorage.removeItem('rounds');
+				localStorage.removeItem('selectedRound');
+
 				localStorage.setItem('players', JSON.stringify(players));
 				goto('/game');
 			}}>Start Game</button
@@ -77,7 +113,25 @@
 
 <style lang="scss">
 	h1 {
-		color: var(--primary-950);
+		color: white;
+		font-size: 3rem;
+	}
+
+	.header {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+
+		button {
+			padding: 10px 20px;
+			border-radius: 5px;
+			border: none;
+			background-color: var(--primary-500);
+			color: var(--primary-50);
+			cursor: pointer;
+			font-size: 1rem;
+		}
 	}
 
 	.main-container {
@@ -87,11 +141,14 @@
 
 		h2 {
 			color: var(--primary-950);
+			font-size: 2rem;
 		}
 	}
 
 	.main-container p {
 		margin: 0;
+		font-size: 1.2rem;
+		letter-spacing: 1px;
 	}
 
 	.main-container .players {
@@ -106,6 +163,11 @@
 		padding: 10px;
 		border-radius: 5px;
 		border: 1px solid var(--primary-500);
+		font-size: 1.2rem;
+	}
+
+	.players h2 {
+		color: white;
 	}
 
 	.players > button {
@@ -116,6 +178,7 @@
 		color: var(--primary-50);
 		cursor: pointer;
 		width: 90vw;
+		font-size: 1.5rem;
 
 		&:disabled {
 			background-color: var(--primary-200);
@@ -130,6 +193,7 @@
 		background-color: var(--primary-500);
 		color: var(--primary-50);
 		cursor: pointer;
+		font-family: 'Pirata One', 'Nunito', system-ui;
 
 		&:disabled {
 			background-color: var(--primary-200);
@@ -164,6 +228,9 @@
 			border-radius: 5px;
 			height: 30px;
 			width: 30px;
+			justify-content: center;
+			align-items: center;
+			display: flex;
 		}
 	}
 </style>

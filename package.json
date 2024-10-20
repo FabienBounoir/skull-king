@@ -29,6 +29,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@fortawesome/fontawesome-free": "^6.6.0",
+		"mongodb": "^6.9.0",
 		"sass": "^1.80.2",
 		"svelte-preprocess": "^6.0.3",
 		"svelte-routing": "^2.13.0",

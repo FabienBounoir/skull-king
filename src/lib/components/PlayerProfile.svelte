@@ -51,6 +51,7 @@
 	<h3>Bonus points</h3>
 	<div class="bonus">
 		<button
+			class:used={player.capturePirate > 0}
 			on:click={() => {
 				player.capturePirate++;
 				if (player.capturePirate > 6) {
@@ -68,6 +69,7 @@
 		</button>
 
 		<button
+			class:used={player.captureSirene > 0}
 			on:click={() => {
 				player.captureSirene++;
 				if (player.captureSirene > 2) {
@@ -83,6 +85,7 @@
 		</button>
 
 		<button
+			class:used={player.captureSkullKing > 0}
 			on:click={() => {
 				if (player.captureSkullKing > 0) {
 					player.captureSkullKing = 0;
@@ -99,6 +102,7 @@
 		</button>
 
 		<button
+			class:used={player.bonus > 0}
 			style="font-size: 1.2rem"
 			on:click={() => {
 				player.bonus += 10;
@@ -115,6 +119,7 @@
 			</div>
 		</button>
 		<button
+			class:used={player.rascal > 0}
 			on:click={() => {
 				player.rascal += 10;
 				if (player.rascal > 20) {
@@ -130,6 +135,7 @@
 		</button>
 
 		<button
+			class:used={player.alliance > 0}
 			on:click={() => {
 				player.alliance++;
 				if (player.alliance > 2) {
@@ -155,7 +161,12 @@
 		border-radius: 10px;
 		padding: 10px 10px 20px 10px;
 
+		button {
+			cursor: pointer;
+		}
+
 		.rainbow {
+			filter: brightness(0.5);
 			background: linear-gradient(
 				90deg,
 				#ff0000,
@@ -188,6 +199,11 @@
 			text-align: center;
 			text-transform: uppercase;
 			margin: 0;
+			letter-spacing: 2px;
+		}
+
+		h3 {
+			margin-bottom: 5px;
 		}
 
 		&.disable {
@@ -199,20 +215,21 @@
 	.bids {
 		display: flex;
 		flex-direction: row;
-		/* justify-content: space-evenly; */
 		gap: 10px;
-		margin: 0 auto;
 		flex-wrap: wrap;
 	}
 
 	.bids button {
-		border-radius: 100%;
-		background-color: #ffffff;
+		border-radius: 5px;
+		// background-color: #ffffff;
 		color: var(--primary-950);
 		border: none;
 		font-weight: bold;
-		width: 30px; /* Ajuste la largeur */
-		height: 30px;
+		width: 40px; /* Ajuste la largeur */
+		// height: 30px;
+		font-size: 0.8em;
+		aspect-ratio: 1;
+		font-family: system-ui !important;
 	}
 
 	.bids button.selected {
@@ -237,6 +254,11 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		color: var(--primary-950);
+
+		&.used {
+			border: 3px solid var(--primary-600);
+		}
 	}
 
 	.bonus button .tooltip {
@@ -252,5 +274,12 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		aspect-ratio: 1;
+
+		.tooltiptext {
+			aspect-ratio: 1;
+			font-weight: 700;
+			font-family: system-ui !important;
+		}
 	}
 </style>
