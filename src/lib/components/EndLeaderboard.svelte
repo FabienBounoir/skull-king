@@ -1,10 +1,14 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { api } from '$lib/utils/api';
 	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	export let players = [];
 	export let rounds = [];
 	export let selectedRound = 0;
+	export let status;
+	export let alreadySave;
 
 	let scores = new Map();
 	let scoreArray = [];
@@ -83,7 +87,17 @@
 		}
 
 		scoreArray = Array.from(scores.entries()).sort((a, b) => b[1] - a[1]);
+		saveGame(scoreArray);
 	};
+
+	function saveGame(score) {
+		if (alreadySave) return;
+		alreadySave = true;
+
+		api.post('/games', { team: 'soprasteria', score }).then((res) => {
+			toast.info('Game saved !');
+		});
+	}
 
 	onMount(() => {
 		calculateScores();
@@ -91,8 +105,8 @@
 </script>
 
 <main class="end-leaderboard">
-	<h1>Partie terminée</h1>
-	<h2>Classement</h2>
+	<h1>End Game</h1>
+	<h2>LeaderBoard</h2>
 	<div class="players">
 		{#each scoreArray as [player, score], index}
 			<div
@@ -110,11 +124,15 @@
 		{/each}
 	</div>
 
-	<button
-		on:click={() => {
-			goto('/');
-		}}>Nouvelle partie</button
-	>
+	<div class="actions">
+		<button style="transform: rotate(180deg);" on:click={() => (status = 'PLAY')}>➜</button>
+
+		<button
+			on:click={() => {
+				goto('/');
+			}}>New Game</button
+		>
+	</div>
 </main>
 
 <style lang="scss">
@@ -127,11 +145,40 @@
 		padding: 10px;
 
 		h1 {
-			color: var(--primary-950);
+			color: var(--primary-50);
 		}
 
 		h2 {
-			color: var(--primary-950);
+			color: var(--primary-50);
+		}
+
+		button {
+			font-size: 1.5rem;
+		}
+
+		.actions {
+			position: fixed;
+			bottom: 10px;
+			left: 50%;
+			transform: translateX(-50%);
+			display: flex;
+			flex-direction: row;
+			width: 90vw;
+			gap: 10px;
+
+			button:first-child {
+				width: 25%;
+			}
+
+			button {
+				padding: 10px 20px;
+				border-radius: 5px;
+				border: none;
+				background-color: var(--primary-500);
+				color: var(--primary-50);
+				cursor: pointer;
+				width: 100%;
+			}
 		}
 	}
 
@@ -201,19 +248,5 @@
 		background-color: red;
 		color: white;
 		font-weight: bold;
-	}
-
-	.end-leaderboard button {
-		position: fixed;
-		bottom: 10px;
-		left: 50%;
-		transform: translateX(-50%);
-		padding: 10px 20px;
-		border-radius: 5px;
-		border: none;
-		background-color: var(--primary-500);
-		color: var(--primary-50);
-		cursor: pointer;
-		width: 90vw;
 	}
 </style>

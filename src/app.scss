@@ -1,19 +1,41 @@
-@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap");
+// @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,600;1,700;1,800;1,900&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
 
 :root {
-    font-family: "Nunito", sans-serif;
+    // --primary-50: #f1f7fe;
+    // --primary-100: #e2effc;
+    // --primary-200: #bfddf8;
+    // --primary-300: #86c2f3;
+    // --primary-400: #46a3ea;
+    // --primary-500: #1c7eca;
+    // --primary-600: #106ab9;
+    // --primary-700: #0f5595;
+    // --primary-800: #10487c;
+    // --primary-900: #133d67;
+    // --primary-950: #0d2744;
 
-    --primary-50: #f1f7fe;
-    --primary-100: #e2effc;
-    --primary-200: #bfddf8;
-    --primary-300: #86c2f3;
-    --primary-400: #46a3ea;
-    --primary-500: #1c7eca;
-    --primary-600: #106ab9;
-    --primary-700: #0f5595;
-    --primary-800: #10487c;
-    --primary-900: #133d67;
-    --primary-950: #0d2744;
+    --primary-50: #f8f7f8;
+    --primary-100: #f0eeee;
+    --primary-200: #ded9da;
+    --primary-300: #c1b8bb;
+    --primary-400: #9f9196;
+    --primary-500: #847379;
+    --primary-600: #6c5d62;
+    --primary-700: #584c50;
+    --primary-800: #4b4144;
+    --primary-900: #41393b;
+    --primary-950: #231f20;
 
     user-select: none;
+}
+
+*,
+*::before,
+*::after {
+    font-family: "Pirata One", "Nunito", system-ui;
+}
+
+body {
+    background-color: var(--primary-950);
 }

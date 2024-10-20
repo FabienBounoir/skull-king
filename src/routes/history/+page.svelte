@@ -1,0 +1,226 @@
+<script>
+	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
+	import AddIcon from '$lib/components/AddIcon.svelte';
+	import { api } from '$lib/utils/api';
+
+	let users = [];
+	let games = [];
+
+	const timeFormater = (date) => {
+		const time = new Date(date).getTime();
+
+		return new Date(time).toLocaleString('fr', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric',
+			hour: 'numeric',
+			minute: 'numeric'
+		});
+	};
+
+	const getData = async () => {
+		games = api.get('/games');
+		users = api.get('/players');
+	};
+
+	onMount(() => {
+		getData();
+	});
+</script>
+
+<div
+	class="header"
+	style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
+>
+	<h1
+		on:click={() => {
+			goto('/');
+		}}
+	>
+		← History
+	</h1>
+</div>
+
+<div class="main-container">
+	<div class="players">
+		<h2>Users Statistique</h2>
+
+		{#await users}
+			{#each Array(Math.floor(Math.random() * 2) + 1).fill(0) as _}
+				<div class="player">
+					<p><span>➜ ------ </span></p>
+					<div>
+						<p>
+							<span>0 / 0</span>
+							<i class="fa-solid fa-chart-simple"></i>
+						</p>
+						<p>
+							<span>0 / 0</span>
+							<i class="fa-solid fa-crown"></i>
+						</p>
+					</div>
+				</div>
+			{/each}
+		{:then users}
+			{#each users as user}
+				<div
+					class="player"
+					class:rainbow={['fabien', 'bouns', 'fab'].includes(user.name.toLowerCase())}
+				>
+					<p><span>➜ {user.name} </span></p>
+					<div>
+						<p>
+							<span>{user.maxScore || 0} / {user?.lowerScore || 0}</span>
+							<i class="fa-solid fa-chart-simple"></i>
+						</p>
+
+						<p>
+							<span>{user.win || 0} / {user?.history?.length || 0}</span>
+							<i class="fa-solid fa-crown"></i>
+						</p>
+					</div>
+				</div>
+			{/each}
+
+			{#if users.length === 0}
+				<p>No user found</p>
+			{/if}
+		{/await}
+
+		<h2>Game History</h2>
+
+		{#await games}
+			{#each Array(Math.floor(Math.random() * 3) + 1).fill(0) as _}
+				<div class="player">
+					<p><span><i class="fa-solid fa-crown"></i> ----</span></p>
+					<div>
+						<p><span>----</span> <i class="fa-solid fa-user" /></p>
+						<p>
+							<span>----</span> <i class="fa-solid fa-calendar-days"></i>
+						</p>
+					</div>
+				</div>
+			{/each}
+		{:then games}
+			{#each games as game}
+				<div class="player">
+					<p class:rainbow={['fabien', 'bouns', 'fab'].includes(game.winner.toLowerCase())}>
+						<span><i class="fa-solid fa-crown"></i> {game.winner}</span>
+					</p>
+					<div>
+						<p><span>{game.score.length}</span> <i class="fa-solid fa-user" /></p>
+						<p>
+							<span>{timeFormater(game.date)}</span> <i class="fa-solid fa-calendar-days"></i>
+						</p>
+					</div>
+				</div>
+			{/each}
+		{/await}
+
+		{#if games.length === 0}
+			<p>No game found</p>
+		{/if}
+	</div>
+</div>
+
+<style lang="scss">
+	h1 {
+		color: white;
+		font-size: 3rem;
+	}
+
+	i,
+	i::after,
+	i::before {
+		font-family: 'Font Awesome 6 Free' !important;
+	}
+
+	.spacer {
+		width: 100%;
+	}
+
+	.rainbow {
+		animation: rainbow 2s infinite alternate;
+
+		* {
+			animation: rainbow 2s infinite alternate;
+		}
+
+		> * {
+			filter: brightness(0.5);
+		}
+	}
+
+	@keyframes rainbow {
+		0% {
+			color: #ff0000;
+		}
+		16% {
+			color: #ff8000;
+		}
+		33% {
+			color: #ffff00;
+		}
+		50% {
+			color: #80ff00;
+		}
+		66% {
+			color: #00ff00;
+		}
+		83% {
+			color: #00ff80;
+		}
+		100% {
+			color: #00ffff;
+		}
+	}
+
+	.player {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		align-items: center;
+		gap: 10px;
+		justify-content: space-between;
+		padding: 3px 10px;
+		background-color: var(--primary-100);
+		color: var(--primary-400);
+		border-radius: 5px;
+		text-transform: uppercase;
+		width: 90vw;
+
+		div {
+			display: flex;
+			flex-direction: row;
+			gap: 25px;
+		}
+	}
+
+	.main-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		h2 {
+			color: var(--primary-950);
+			font-size: 2rem;
+		}
+	}
+
+	.main-container .players {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
+
+	.players h2 {
+		color: var(--primary-50);
+	}
+
+	p {
+		color: var(--primary-500);
+	}
+</style>

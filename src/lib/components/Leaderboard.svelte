@@ -141,6 +141,7 @@
 
 	.leaderboard p {
 		margin: 0;
+		letter-spacing: 2px;
 	}
 
 	.leaderboard h1 {
