@@ -3,6 +3,8 @@
 	import { api } from '$lib/utils/api';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { quintOut } from 'svelte/easing';
+	import { fade, fly, slide } from 'svelte/transition';
 
 	export let players = [];
 	export let rounds = [];
@@ -104,7 +106,7 @@
 	});
 </script>
 
-<main class="end-leaderboard">
+<main class="end-leaderboard" in:fly={{ duration: 300, easing: quintOut, x: 500 }}>
 	<h1>End Game</h1>
 	<h2>LeaderBoard</h2>
 	<div class="players">
@@ -115,6 +117,7 @@
 				class:top3={index === 2}
 				class="player"
 				class:bold={index < 3}
+				transition:slide={{ duration: 300, easing: quintOut, delay: (index + 1) * 200 }}
 			>
 				<p>
 					<span>{top[index] || index + 1}</span>{player}
@@ -124,7 +127,7 @@
 		{/each}
 	</div>
 
-	<div class="actions">
+	<div class="actions" in:fade={{ delay: 700 }}>
 		<button style="transform: rotate(180deg);" on:click={() => (status = 'PLAY')}>➜</button>
 
 		<button
@@ -208,6 +211,7 @@
 		align-items: center;
 		gap: 10px;
 		justify-content: center;
+		margin-bottom: 40px;
 	}
 
 	.bold {

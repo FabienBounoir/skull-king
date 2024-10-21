@@ -6,6 +6,8 @@
 	import RoundAnnouncement from '$lib/components/RoundAnnouncement.svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { quintInOut, quintOut } from 'svelte/easing';
+	import { fade, slide } from 'svelte/transition';
 
 	/**
 	 * Représente un joueur dans un nouveau tour.
@@ -35,7 +37,7 @@
 	//to add new player info
 	let playerName = '';
 	let startWith = 'ZERO';
-	let customNewScore = 0;
+	let customNewScore = '0';
 	let actualScore = [];
 	let positionNewUser = 0;
 
@@ -51,6 +53,8 @@
 			localStorage.removeItem('selectedRound');
 			return;
 		}
+
+		positionNewUser = players.length - 1;
 
 		localStorage.setItem('players', JSON.stringify(players));
 		localStorage.setItem('rounds', JSON.stringify(rounds));
@@ -128,7 +132,7 @@
 			return;
 		}
 
-		if (players.includes(playerName)) {
+		if (players.some((p) => p.toLowerCase() === playerName.toLowerCase())) {
 			toast.warning('Player already exists');
 			return;
 		}
@@ -145,10 +149,18 @@
 			score = getTopLowerScore().top;
 		} else if (startWith == 'MIDDLE') {
 			let findScore = getTopLowerScore();
-			let echo = findScore.top - findScore.lower;
-
-			score = findScore.lower + echo / 2;
+			score = (findScore.lower + findScore.top) / 2;
 		} else if (startWith == 'CUSTOM') {
+			if (!customNewScore) {
+				toast.error('Custom score cannot be empty');
+				return;
+			}
+
+			if (isNaN(customNewScore)) {
+				toast.error('Custom score must be a number');
+				return;
+			}
+
 			score = customNewScore;
 		}
 
@@ -263,7 +275,7 @@
 	{:else if status == 'END'}
 		<EndLeaderboard {rounds} {selectedRound} {players} bind:status bind:alreadySave />
 	{:else if status == 'NEW_PLAYER'}
-		<div class="add-player">
+		<div class="add-player" in:fade={{ duration: 700, easing: quintInOut, axis: 'x' }}>
 			<h1>Add New User</h1>
 
 			<div class="add-player-info">
@@ -276,9 +288,11 @@
 					<label for="playerName">It starts with how many points ?</label>
 					<select bind:value={startWith}>
 						<option value="ZERO">Zero points</option>
-						<option value="LOW">Low score</option>
-						<option value="BEST">Best score</option>
-						<option value="MIDDLE">Middle score</option>
+						<option value="LOW">Low score ({getTopLowerScore().lower}pts)</option>
+						<option value="BEST">Best score ({getTopLowerScore().top}pts)</option>
+						<option value="MIDDLE"
+							>Middle score ({(getTopLowerScore().lower + getTopLowerScore().top) / 2}pts)</option
+						>
 						<option value="CUSTOM">Custom score</option>
 					</select>
 
@@ -299,7 +313,7 @@
 				</select>
 			</div>
 
-			<div class="navigation">
+			<div class="navigation" style="width: 100%;">
 				<button style="transform: rotate(180deg); width: 20%;" on:click={() => (status = 'PLAY')}
 					>➜</button
 				>
@@ -348,6 +362,7 @@
 		align-items: center;
 		gap: 10vh;
 		width: 100%;
+		cursor: pointer;
 
 		select {
 			width: 100%;

@@ -3,6 +3,8 @@
 	import { onMount } from 'svelte';
 	import AddIcon from '$lib/components/AddIcon.svelte';
 	import { api } from '$lib/utils/api';
+	import { scale, slide } from 'svelte/transition';
+	import { quintInOut } from 'svelte/easing';
 
 	let users = [];
 	let games = [];
@@ -44,12 +46,12 @@
 
 <div class="main-container">
 	<div class="players">
-		<h2>Users Statistique</h2>
+		<h2>Users Statistics</h2>
 
 		{#await users}
 			{#each Array(Math.floor(Math.random() * 2) + 1).fill(0) as _}
-				<div class="player">
-					<p><span>➜ ------ </span></p>
+				<div class="player skeleton">
+					<p>➜ <span>------ </span></p>
 					<div>
 						<p>
 							<span>0 / 0</span>
@@ -63,7 +65,7 @@
 				</div>
 			{/each}
 		{:then users}
-			{#each users as user}
+			{#each users as user, index}
 				<div
 					class="player"
 					class:rainbow={['fabien', 'bouns', 'fab'].includes(user.name.toLowerCase())}
@@ -92,8 +94,8 @@
 
 		{#await games}
 			{#each Array(Math.floor(Math.random() * 3) + 1).fill(0) as _}
-				<div class="player">
-					<p><span><i class="fa-solid fa-crown"></i> ----</span></p>
+				<div class="player skeleton">
+					<p><i class="fa-solid fa-crown"></i> <span>----</span></p>
 					<div>
 						<p><span>----</span> <i class="fa-solid fa-user" /></p>
 						<p>
@@ -119,7 +121,7 @@
 		{/await}
 
 		{#if games.length === 0}
-			<p>No game found</p>
+			<p style="color: var(--primary-500);">No game found</p>
 		{/if}
 	</div>
 </div>
@@ -189,6 +191,26 @@
 		border-radius: 5px;
 		text-transform: uppercase;
 		width: 90vw;
+
+		&.skeleton {
+			span {
+				background: var(--primary-500);
+				border-radius: 5px;
+			}
+
+			p {
+				animation: skeleton 0.7s infinite alternate;
+			}
+
+			@keyframes skeleton {
+				0% {
+					opacity: 0.5;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+		}
 
 		div {
 			display: flex;

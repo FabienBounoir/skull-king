@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import AddIcon from '$lib/components/AddIcon.svelte';
+	import { scale } from 'svelte/transition';
 
 	let players = [];
 	let playerName = '';
@@ -64,7 +65,7 @@
 		<h2>Players</h2>
 
 		{#each players as player}
-			<div class="player">
+			<div class="player" in:scale>
 				<p>{player}</p>
 				<button on:click={() => (players = players.filter((p) => p !== player))}>❌</button>
 			</div>

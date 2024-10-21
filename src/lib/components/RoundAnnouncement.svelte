@@ -6,10 +6,16 @@
 	export let displayAnnouncement;
 </script>
 
-<div class="round-announcement" transition:fade={{ duration: 500, easing: quintInOut }}
+<div
+	class="round-announcement"
+	in:fade={{ duration: 50, easing: quintInOut }}
+	out:fade={{ duration: 500, easing: quintInOut }}
 	on:click={() => (displayAnnouncement = false)}
 >
-	<h1 transition:scale={{ delay: 300, duration: 800, opacity: 0.5, start: 0, easing: quintInOut }}>
+	<h1
+		in:scale={{ delay: 30, duration: 800, opacity: 0.5, start: 0, easing: quintInOut }}
+		out:fade={{ duration: 500 }}
+	>
 		Round {round}
 	</h1>
 </div>
