@@ -3,9 +3,12 @@
 	import { fade, scale } from 'svelte/transition';
 
 	export let round;
+	export let displayAnnouncement;
 </script>
 
-<div class="round-announcement" transition:fade={{ duration: 500, easing: quintInOut }}>
+<div class="round-announcement" transition:fade={{ duration: 500, easing: quintInOut }}
+	on:click={() => (displayAnnouncement = false)}
+>
 	<h1 transition:scale={{ delay: 300, duration: 800, opacity: 0.5, start: 0, easing: quintInOut }}>
 		Round {round}
 	</h1>

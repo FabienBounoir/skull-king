@@ -258,7 +258,7 @@
 		</div>
 
 		{#if displayAnnouncement}
-			<RoundAnnouncement round={rounds.length} />
+			<RoundAnnouncement bind:displayAnnouncement round={rounds.length} />
 		{/if}
 	{:else if status == 'END'}
 		<EndLeaderboard {rounds} {selectedRound} {players} bind:status bind:alreadySave />
