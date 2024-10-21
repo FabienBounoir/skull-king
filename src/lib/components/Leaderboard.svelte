@@ -29,12 +29,11 @@
 
 			let round = rounds[i];
 			for (let player of round) {
-				console.log('    > PLAYER', player);
 				if (!scores.has(player.player)) {
 					scores.set(player.player, 0);
 				}
 
-				if (player.custom > 0) {
+				if (player.custom) {
 					scores.set(player.player, scores.get(player.player) + player.custom);
 					continue;
 				}
@@ -60,7 +59,6 @@
 				}
 
 				if (player.winTurn === player.betTurn && player.winTurn > 0) {
-					console.log(' player.winTurn', player.winTurn);
 					score += player.winTurn * 20;
 				} else if (player.winTurn == 0 && player.betTurn == 0) {
 					score += (i + 1) * 10;
@@ -93,12 +91,8 @@
 					score += player.rascal;
 				}
 
-				console.log('    > SCORE POSITIF', score, scores.get(player.player));
-
 				scores.set(player.player, scores.get(player.player) + score);
 			}
-
-			console.log('    > i et selectedRound', i, selectedRound);
 		}
 
 		actualScore = Array.from(scores.entries());
@@ -110,7 +104,6 @@
 	};
 
 	onMount(() => {
-		console.error('    > ON MOUNT', rounds);
 		calculateScores();
 	});
 </script>

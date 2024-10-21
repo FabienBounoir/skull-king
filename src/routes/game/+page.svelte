@@ -6,8 +6,8 @@
 	import RoundAnnouncement from '$lib/components/RoundAnnouncement.svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { quintInOut, quintOut } from 'svelte/easing';
-	import { fade, slide } from 'svelte/transition';
+	import { quintInOut } from 'svelte/easing';
+	import { fade } from 'svelte/transition';
 
 	/**
 	 * Représente un joueur dans un nouveau tour.
@@ -33,6 +33,7 @@
 
 	//round Announcement
 	let displayAnnouncement = false;
+	let timeoutAnnouncement = null;
 
 	//to add new player info
 	let playerName = '';
@@ -100,7 +101,7 @@
 		rounds = [...rounds, newRound];
 		selectedRound = rounds.length - 1;
 
-		setTimeout(() => {
+		timeoutAnnouncement = setTimeout(() => {
 			displayAnnouncement = false;
 		}, 2000);
 	}
@@ -270,7 +271,7 @@
 		</div>
 
 		{#if displayAnnouncement}
-			<RoundAnnouncement bind:displayAnnouncement round={rounds.length} />
+			<RoundAnnouncement bind:displayAnnouncement round={rounds.length} bind:timeoutAnnouncement />
 		{/if}
 	{:else if status == 'END'}
 		<EndLeaderboard {rounds} {selectedRound} {players} bind:status bind:alreadySave />

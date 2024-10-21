@@ -4,6 +4,8 @@
 	import Mermaid from '$lib/icons/Mermaid.svelte';
 	import Skull from '$lib/icons/Skull.svelte';
 	import Sword from '$lib/icons/Sword.svelte';
+	import { info } from 'sass';
+	import { toast } from 'svelte-sonner';
 
 	/**
 	 * Représente un joueur dans un nouveau tour.
@@ -24,7 +26,7 @@
 	export let index = 0;
 </script>
 
-<main class="profile" class:disable={player.custom > 0}>
+<main class="profile" class:disable={player.custom}>
 	<h2 class:rainbow={['bouns', 'fab', 'fabien'].includes(player?.player?.toLowerCase?.())}>
 		{player.player}
 	</h2>
@@ -208,7 +210,7 @@
 
 		&.disable {
 			pointer-events: none;
-			filter: grayscale(1);
+			filter: grayscale(1) brightness(0.7);
 		}
 	}
 

@@ -4,13 +4,19 @@
 
 	export let round;
 	export let displayAnnouncement;
+	export let timeoutAnnouncement;
 </script>
 
 <div
 	class="round-announcement"
 	in:fade={{ duration: 50, easing: quintInOut }}
 	out:fade={{ duration: 500, easing: quintInOut }}
-	on:click={() => (displayAnnouncement = false)}
+	on:click={() => {
+		if (timeoutAnnouncement) {
+			clearTimeout(timeoutAnnouncement);
+		}
+		displayAnnouncement = false;
+	}}
 >
 	<h1
 		in:scale={{ delay: 30, duration: 800, opacity: 0.5, start: 0, easing: quintInOut }}

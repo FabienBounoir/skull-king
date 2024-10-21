@@ -28,7 +28,7 @@
 					scores.set(player.player, 0);
 				}
 
-				if (player.custom > 0) {
+				if (player.custom) {
 					scores.set(player.player, scores.get(player.player) + player.custom);
 					continue;
 				}
