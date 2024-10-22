@@ -1,15 +1,31 @@
 <script>
+	import myshades from '$lib/utils/myshades';
 	import { toast } from 'svelte-sonner';
 
 	let audio = null;
 
 	const playSound = () => {
 		if (!audio) {
+			toast.loading('Ah ah ah ah ah !');
 			audio = new Audio('/sounds/skull-king.mp3');
 			audio.play();
 		} else {
 			audio.play();
 		}
+	};
+
+	const changePalette = () => {
+		let primary = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+		if (primary.length < 7) {
+			primary = primary.padEnd(7, '0');
+		}
+
+		console.log('Initial Color selected', primary);
+
+		myshades({
+			primary
+		});
 	};
 </script>
 
@@ -17,6 +33,7 @@
 	<img
 		on:click={() => {
 			playSound();
+			changePalette();
 		}}
 		src="/skullking.svg"
 		alt="SkullKing"
@@ -35,7 +52,7 @@
 		align-items: center;
 		justify-content: center;
 		height: 100vh;
-		// background-color: black;
+		cursor: pointer;
 
 		h1 {
 			color: var(--primary-950);
@@ -56,7 +73,7 @@
 		margin: 0 10px;
 		text-decoration: none;
 		background-color: white;
-		color: black;
+		color: var(--primary-950);
 		padding: 10px 20px;
 		border-radius: 5px;
 		width: 80vw;
