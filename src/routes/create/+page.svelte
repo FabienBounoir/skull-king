@@ -4,11 +4,13 @@
 	import { onMount } from 'svelte';
 	import AddIcon from '$lib/components/AddIcon.svelte';
 	import { scale } from 'svelte/transition';
+	import { calculeMaxRound } from '$lib/utils/functionnality';
 
 	let players = [];
 	let playerName = '';
 
 	let oldGameExists = false;
+	let totalRound = 10;
 
 	onMount(() => {
 		players = JSON.parse(localStorage.getItem('players')) || [];
@@ -64,10 +66,33 @@
 	<div class="players">
 		<h2>Players</h2>
 
-		{#each players as player}
+		{#each players as player, i}
 			<div class="player" in:scale>
 				<p>{player}</p>
-				<button on:click={() => (players = players.filter((p) => p !== player))}>❌</button>
+				<div class="actions">
+					<div class="nav">
+						<button
+							disabled={i === 0}
+							on:click={() => {
+								const index = players.indexOf(player);
+								if (index > 0) {
+									[players[index], players[index - 1]] = [players[index - 1], players[index]];
+								}
+							}}>⬆</button
+						>
+						<button
+							disabled={i === players.length - 1}
+							on:click={() => {
+								const index = players.indexOf(player);
+								if (index < players.length - 1) {
+									[players[index], players[index + 1]] = [players[index + 1], players[index]];
+								}
+							}}
+							>⬇
+						</button>
+					</div>
+					<button on:click={() => (players = players.filter((p) => p !== player))}>❌</button>
+				</div>
 			</div>
 		{/each}
 
@@ -89,10 +114,19 @@
 				on:click={() => {
 					if (canAddPlayer(playerName)) {
 						let name = playerName.trim();
-						name = name.charAt(0).toUpperCase() + name.slice(1);
+						name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
 
 						players = [...players, formatName(name)];
 						playerName = '';
+
+						const roundCanPlay = calculeMaxRound(players.length);
+
+						if (roundCanPlay < totalRound) {
+							totalRound = roundCanPlay;
+							toast.warning(`You can play only ${roundCanPlay} rounds`);
+						} else {
+							totalRound = roundCanPlay;
+						}
 					}
 				}}
 				><AddIcon />
@@ -171,6 +205,36 @@
 		color: white;
 	}
 
+	.players .actions {
+		display: flex;
+		flex-direction: row;
+		gap: 10px;
+
+		.nav {
+			display: flex;
+			flex-direction: row;
+			button:first-child {
+				border-radius: 5px 0 0 5px;
+				border-right: 1px solid var(--primary-500);
+			}
+
+			button:last-child {
+				border-radius: 0 5px 5px 0;
+			}
+		}
+
+		button {
+			cursor: pointer;
+			color: var(--primary-700);
+
+			&:disabled {
+				color: var(--primary-200);
+				cursor: not-allowed;
+				opacity: 0.5;
+			}
+		}
+	}
+
 	.players > button {
 		padding: 10px 20px;
 		border-radius: 5px;
@@ -180,6 +244,7 @@
 		cursor: pointer;
 		width: 90vw;
 		font-size: 1.5rem;
+		cursor: pointer;
 
 		&:disabled {
 			background-color: var(--primary-200);
