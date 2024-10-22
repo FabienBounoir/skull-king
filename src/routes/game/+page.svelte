@@ -56,6 +56,7 @@
 			return;
 		}
 
+		totalRound = calculeMaxRound(players.length);
 		positionNewUser = players.length - 1;
 
 		localStorage.setItem('players', JSON.stringify(players));
@@ -226,10 +227,14 @@
 
 		<div class="round">
 			<h1>Round {1 + selectedRound}</h1>
-			{calculeMaxRound(players.length + 1)}
 			<button
 				class="add-player"
+				class:disable={calculeMaxRound(players.length + 1) < rounds.length}
 				on:click={() => {
+					if (calculeMaxRound(players.length + 1) < rounds.length) {
+						return toast.error("You can't add more player at this point !");
+					}
+
 					status = 'NEW_PLAYER';
 				}}>+</button
 			>
@@ -361,6 +366,12 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+
+			&.disable {
+				background-color: var(--primary-100);
+				color: var(--primary-500);
+				cursor: not-allowed;
+			}
 		}
 	}
 
