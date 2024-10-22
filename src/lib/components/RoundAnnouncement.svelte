@@ -40,5 +40,6 @@
 		font-size: 2rem;
 		color: var(--primary-50) !important;
 		background-color: var(--primary-800);
+		cursor: pointer;
 	}
 </style>

@@ -93,7 +93,7 @@
 	};
 
 	function saveGame(score) {
-		if (alreadySave) return;
+		if (alreadySave || status != 'END') return;
 		alreadySave = true;
 
 		api.post('/games', { team: 'soprasteria', score }).then((res) => {
@@ -101,13 +101,35 @@
 		});
 	}
 
+	function animate(node, options) {
+		if (status === 'END') {
+			return options.fn(node, options);
+		} else {
+			if (options.forceAnimate) {
+				options.duration = 300;
+				options.delay = 300;
+				return options.fn(node, options);
+			}
+		}
+	}
+
 	onMount(() => {
 		calculateScores();
 	});
 </script>
 
-<main class="end-leaderboard" in:fly={{ duration: 300, easing: quintOut, x: 500 }}>
-	<h1>End Game</h1>
+<main
+	class="end-leaderboard"
+	in:fly={{ duration: 300, easing: quintOut, x: 500 }}
+	on:click={() => {
+		if (status != 'END') {
+			status = 'PLAY';
+		}
+	}}
+>
+	{#if status === 'END'}
+		<h1>End Game</h1>
+	{/if}
 	<h2>LeaderBoard</h2>
 	<div class="players">
 		{#each scoreArray as [player, score], index}
@@ -117,7 +139,13 @@
 				class:top3={index === 2}
 				class="player"
 				class:bold={index < 3}
-				transition:slide={{ duration: 300, easing: quintOut, delay: (index + 1) * 200 }}
+				transition:animate={{
+					fn: fly,
+					forceAnimate: false,
+					duration: 300,
+					easing: quintOut,
+					delay: (index + 1) * 200
+				}}
 			>
 				<p>
 					<span>{top[index] || index + 1}</span>{player}
@@ -127,14 +155,20 @@
 		{/each}
 	</div>
 
-	<div class="actions" in:fade={{ delay: 700 }}>
-		<button style="transform: rotate(180deg);" on:click={() => (status = 'PLAY')}>➜</button>
+	<div class="actions" in:animate={{ fn: fade, forceAnimate: true, delay: 700 }}>
+		{#if status != 'END'}
+			<button on:click={() => (status = 'PLAY')}>Close</button>
+		{:else}
+			<button style="transform: rotate(180deg);width: 25%;" on:click={() => (status = 'PLAY')}
+				>➜</button
+			>
 
-		<button
-			on:click={() => {
-				goto('/');
-			}}>New Game</button
-		>
+			<button
+				on:click={() => {
+					goto('/');
+				}}>New Game</button
+			>
+		{/if}
 	</div>
 </main>
 
@@ -168,10 +202,6 @@
 			flex-direction: row;
 			width: 90vw;
 			gap: 10px;
-
-			button:first-child {
-				width: 25%;
-			}
 
 			button {
 				padding: 10px 20px;

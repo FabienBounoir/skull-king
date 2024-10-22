@@ -5,6 +5,7 @@
 	export let rounds = [];
 	export let selectedRound = 0;
 	export let actualScore = [];
+	export let status;
 
 	let scores = new Map();
 	let bestScore = 0;
@@ -108,7 +109,12 @@
 	});
 </script>
 
-<main class="leaderboard">
+<main
+	class="leaderboard"
+	on:click={() => {
+		status = 'LEADERBOARD';
+	}}
+>
 	<h1>Score Board</h1>
 	<div class="players">
 		{#each actualScore as [player, score], index}
@@ -130,6 +136,7 @@
 		gap: 10px;
 		padding: 0 10px 10px 10px;
 		background-color: var(--primary-200);
+		cursor: pointer;
 	}
 
 	.leaderboard p {

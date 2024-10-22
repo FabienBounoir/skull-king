@@ -4,6 +4,7 @@
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import PlayerProfile from '$lib/components/PlayerProfile.svelte';
 	import RoundAnnouncement from '$lib/components/RoundAnnouncement.svelte';
+	import { calculeMaxRound } from '$lib/utils/functionnality';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { quintInOut } from 'svelte/easing';
@@ -72,6 +73,8 @@
 			} else {
 				addNewRound();
 			}
+
+			totalRound = calculeMaxRound(players.length);
 
 			status = 'PLAY';
 		} catch (e) {
@@ -198,7 +201,11 @@
 		}
 
 		rounds = [...manageRound];
-		players = [...players, playerName];
+		let playerTemp = players;
+
+		playerTemp.splice(positionNewUser + 1, 0, playerName);
+
+		players = [...playerTemp];
 		playerName = '';
 
 		status = 'PLAY';
@@ -214,11 +221,12 @@
 <main class="game-container">
 	{#if status == 'PLAY'}
 		{#key (rounds, players, selectedRound)}
-			<Leaderboard {rounds} {selectedRound} {players} bind:actualScore />
+			<Leaderboard bind:status {rounds} {selectedRound} {players} bind:actualScore />
 		{/key}
 
 		<div class="round">
 			<h1>Round {1 + selectedRound}</h1>
+			{calculeMaxRound(players.length + 1)}
 			<button
 				class="add-player"
 				on:click={() => {
@@ -261,7 +269,7 @@
 						}
 					}}
 				>
-					{#if rounds.length < 10}
+					{#if rounds.length < totalRound}
 						End Round
 					{:else}
 						End Game
@@ -273,7 +281,7 @@
 		{#if displayAnnouncement}
 			<RoundAnnouncement bind:displayAnnouncement round={rounds.length} bind:timeoutAnnouncement />
 		{/if}
-	{:else if status == 'END'}
+	{:else if status == 'END' || status == 'LEADERBOARD'}
 		<EndLeaderboard {rounds} {selectedRound} {players} bind:status bind:alreadySave />
 	{:else if status == 'NEW_PLAYER'}
 		<div class="add-player" in:fade={{ duration: 700, easing: quintInOut, axis: 'x' }}>
