@@ -44,6 +44,7 @@
 	style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
 >
 	<h1
+		style="cursor: pointer;"
 		on:click={() => {
 			goto('/');
 		}}

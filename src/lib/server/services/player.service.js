@@ -23,15 +23,26 @@ class PlayerService {
 	 * @param {string} team
 	 */
 	async getAll(team) {
-		let users = await this.#collection.find({
-			team
-		}).toArray();
+		let users = await this.#collection.aggregate([
+			{
+				$match: { team }
+			},
+			{
+				$addFields: {
+					totalGame: { $size: "$history" }
+				}
+			},
+			{
+				$sort: { win: -1, totalGame: 1 }
+			},
+			{
+				$project: {
+					history: 0
+				}
+			}
+		]).toArray();
 
-		if (users && users.length > 0) {
-			return users.sort((a, b) => b.win - a.win);
-		}
-
-		return [];
+		return users.length > 0 ? users : [];
 	}
 
 	/**

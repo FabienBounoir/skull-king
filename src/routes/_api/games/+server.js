@@ -29,8 +29,6 @@ export const POST = async ({ request }) => {
 			throw error(404, { id: "request.invalid", message: "Invalid request" });
 		}
 
-		console.log(score, team);
-
 		const game = await gameService.create(score, team);
 
 		if (score && score.length > 0) {

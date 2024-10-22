@@ -34,7 +34,6 @@
 	.main-container {
 		padding: 5px;
 		box-sizing: border-box;
-		// min-height: 100vh;
 	}
 
 	.loader {

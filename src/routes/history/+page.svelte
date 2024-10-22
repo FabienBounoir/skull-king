@@ -36,6 +36,7 @@
 	style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;"
 >
 	<h1
+		style="cursor: pointer;"
 		on:click={() => {
 			goto('/');
 		}}
@@ -78,7 +79,7 @@
 						</p>
 
 						<p>
-							<span>{user.win || 0} / {user?.history?.length || 0}</span>
+							<span>{user.win || 0} / {user?.totalGame || 0}</span>
 							<i class="fa-solid fa-crown"></i>
 						</p>
 					</div>

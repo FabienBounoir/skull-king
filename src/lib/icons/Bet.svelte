@@ -1,5 +1,5 @@
 <svg
-	fill="#000000"
+	fill="var(--primary-950)"
 	height="30px"
 	width="30px"
 	version="1.1"

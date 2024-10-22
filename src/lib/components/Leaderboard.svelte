@@ -15,7 +15,6 @@
 		scores.clear();
 
 		for (let player of players) {
-			console.log('    > PLAYER', player);
 			if (!scores.has(player)) {
 				scores.set(player, 0);
 			}
@@ -40,6 +39,7 @@
 				}
 
 				let score = 0;
+
 				// player lose the bet
 				if (player.winTurn != player.betTurn) {
 					if (player.betTurn === 0) {
@@ -52,10 +52,7 @@
 						score -= player.rascal;
 					}
 
-					console.log('    > SCORE NEGATIF', score, scores.get(player.player));
-
 					scores.set(player.player, scores.get(player.player) + score);
-
 					continue;
 				}
 
@@ -125,7 +122,7 @@
 	</div>
 </main>
 
-<style>
+<style lang="scss">
 	.leaderboard {
 		border: 5px solid var(--primary-800);
 		border-radius: 10px;
@@ -157,28 +154,34 @@
 		align-items: center;
 		gap: 10px;
 		justify-content: center;
-	}
 
-	.leaderboard .player {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		align-items: center;
-		gap: 10px;
-		justify-content: center;
-		padding: 3px 10px;
-		background-color: var(--primary-100);
-		color: var(--primary-400);
-		border-radius: 5px;
-		text-transform: uppercase;
-	}
+		.player {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 10px;
+			justify-content: center;
+			padding: 3px 10px;
+			background-color: var(--primary-100);
+			color: var(--primary-400);
+			border-radius: 5px;
+			text-transform: uppercase;
 
-	.leaderboard .player.selected {
-		background-color: var(--primary-700);
-		font-weight: bold;
-		color: white;
-		font-weight: bold;
-		animation: blinker 1s linear alternate infinite;
+			&:not(.selected) {
+				p {
+					color: var(--primary-800);
+				}
+			}
+
+			&.selected {
+				background-color: var(--primary-700);
+				font-weight: bold;
+				color: var(--primary-200);
+				font-weight: bold;
+				animation: blinker 1s linear alternate infinite;
+			}
+		}
 	}
 
 	@keyframes blinker {

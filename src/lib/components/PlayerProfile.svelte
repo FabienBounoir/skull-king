@@ -223,15 +223,18 @@
 
 	.bids button {
 		border-radius: 5px;
-		// background-color: #ffffff;
 		color: var(--primary-950);
 		border: none;
 		font-weight: bold;
-		width: 40px; /* Ajuste la largeur */
-		// height: 30px;
+		width: 40px;
 		font-size: 0.8em;
 		aspect-ratio: 1;
 		font-family: system-ui !important;
+		transition: transform 0.2s;
+
+		&:active {
+			transform: scale(1.2);
+		}
 	}
 
 	.bids button.selected {
@@ -257,9 +260,14 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--primary-950);
+		transition: transform 0.2s;
 
 		&.used {
 			border: 3px solid var(--primary-600);
+		}
+
+		&:active {
+			transform: scale(1.2);
 		}
 	}
 

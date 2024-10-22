@@ -7,6 +7,7 @@
 	height="30px"
 	viewBox="0 0 512 512"
 	xml:space="preserve"
+	fill="var(--primary-950)"
 >
 	<g>
 		<path

@@ -80,6 +80,7 @@
 			status = 'PLAY';
 		} catch (e) {
 			console.error('Error parsing local storage', e);
+			toast.error('Error while loading data');
 			goto('/create');
 		}
 	});
@@ -143,10 +144,7 @@
 		}
 
 		let manageRound = [];
-
 		let score = 0;
-
-		console.log('getTopLowerScore()', getTopLowerScore());
 
 		if (startWith == 'LOW') {
 			score = getTopLowerScore().lower;
@@ -366,11 +364,16 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			transition: transform 0.2s;
 
 			&.disable {
 				background-color: var(--primary-100);
 				color: var(--primary-500);
 				cursor: not-allowed;
+			}
+
+			&:active {
+				transform: scale(1.2);
 			}
 		}
 	}
@@ -467,5 +470,10 @@
 		font-size: 1.5rem;
 		border: none;
 		cursor: pointer;
+		transition: transform 0.2s;
+
+		&:active {
+			transform: scale(1.1);
+		}
 	}
 </style>
