@@ -32,9 +32,9 @@
 	</h2>
 	<h3>Bids</h3>
 	<div class="bids">
-		<button class="selected" on:click={() => (player.betTurn = 0)}>{0}</button>
+		<button class:selected={player.betTurn == 0} on:click={() => (player.betTurn = 0)}>{0}</button>
 		{#each Array.from({ length: index + 1 }) as _, i}
-			<button class:selected={i < player.betTurn} on:click={() => (player.betTurn = i + 1)}
+			<button class:selected={player.betTurn == i + 1} on:click={() => (player.betTurn = i + 1)}
 				>{i + 1}</button
 			>
 		{/each}
@@ -42,9 +42,9 @@
 
 	<h3>Tricks won</h3>
 	<div class="bids">
-		<button class="selected" on:click={() => (player.winTurn = 0)}>{0}</button>
+		<button class:selected={player.winTurn == 0} on:click={() => (player.winTurn = 0)}>{0}</button>
 		{#each Array.from({ length: index + 1 }) as _, i}
-			<button class:selected={i < player.winTurn} on:click={() => (player.winTurn = i + 1)}
+			<button class:selected={player.winTurn == i + 1} on:click={() => (player.winTurn = i + 1)}
 				>{i + 1}</button
 			>
 		{/each}

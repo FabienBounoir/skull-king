@@ -1,104 +1,47 @@
 <script>
+	import { calculeRoundPoints } from '$lib/utils/functionnality';
 	import { afterUpdate, onMount } from 'svelte';
 
 	export let players = [];
 	export let rounds = [];
 	export let selectedRound = 0;
-	export let actualScore = [];
+	export let score = [];
 	export let status;
 
-	let scores = new Map();
+	let usersScore = new Map();
 	let bestScore = 0;
 
 	const calculateScores = () => {
 		bestScore = 0;
-		scores.clear();
+		usersScore.clear();
 
 		for (let player of players) {
-			if (!scores.has(player)) {
-				scores.set(player, 0);
+			if (!usersScore.has(player)) {
+				usersScore.set(player, 0);
 			}
 		}
 
-		actualScore = Array.from(scores.entries());
+		score = Array.from(usersScore.entries());
 
 		for (let i = 0; i < rounds.length; i++) {
 			if (i >= selectedRound) {
 				break;
 			}
 
-			let round = rounds[i];
+			const round = rounds[i];
 			for (let player of round) {
-				if (!scores.has(player.player)) {
-					scores.set(player.player, 0);
-				}
-
-				if (player.custom) {
-					scores.set(player.player, scores.get(player.player) + player.custom);
-					continue;
-				}
-
-				let score = 0;
-
-				// player lose the bet
-				if (player.winTurn != player.betTurn) {
-					if (player.betTurn === 0) {
-						score -= (i + 1) * 10;
-					} else {
-						score -= Math.abs(player.winTurn - player.betTurn) * 10;
-					}
-
-					if (player.rascal > 0) {
-						score -= player.rascal;
-					}
-
-					scores.set(player.player, scores.get(player.player) + score);
-					continue;
-				}
-
-				if (player.winTurn === player.betTurn && player.winTurn > 0) {
-					score += player.winTurn * 20;
-				} else if (player.winTurn == 0 && player.betTurn == 0) {
-					score += (i + 1) * 10;
-				}
-
-				// player capture pirate with the skull king
-				if (player.capturePirate > 0) {
-					score += player.capturePirate * 30;
-				}
-
-				// player capture sirene with pirate
-				if (player.captureSirene > 0) {
-					score += player.captureSirene * 20;
-				}
-
-				// player capture skull king with sirene
-				if (player.captureSkullKing > 0) {
-					score += player.captureSkullKing * 40;
-				}
-
-				if (player.alliance > 0) {
-					score += player.alliance * 20;
-				}
-
-				if (player.bonus > 0) {
-					score += player.bonus;
-				}
-
-				if (player.rascal > 0) {
-					score += player.rascal;
-				}
-
-				scores.set(player.player, scores.get(player.player) + score);
+				const actualScore = usersScore.get(player.player) || 0;
+				const roundScore = calculeRoundPoints(player, i);
+				usersScore.set(player.player, actualScore + roundScore);
 			}
 		}
 
-		actualScore = Array.from(scores.entries());
+		score = Array.from(usersScore.entries());
 		setBestScore();
 	};
 
 	const setBestScore = () => {
-		bestScore = Array.from(scores.values()).reduce((a, b) => Math.max(a, b));
+		bestScore = Array.from(usersScore.values()).reduce((a, b) => Math.max(a, b));
 	};
 
 	onMount(() => {
@@ -114,7 +57,7 @@
 >
 	<h1>Score Board</h1>
 	<div class="players">
-		{#each actualScore as [player, score], index}
+		{#each score as [player, score], index}
 			<div class="player" class:selected={index == selectedRound % players.length}>
 				<p>{bestScore == score ? '🏆 ' : ''}{player}: {score}</p>
 			</div>

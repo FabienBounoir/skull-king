@@ -1,6 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
-	import EndLeaderboard from '$lib/components/EndLeaderboard.svelte';
+	import ActionMenu from '$lib/components/ActionMenu.svelte';
+	import FullPageLeaderboard from '$lib/components/FullPageLeaderboard.svelte';
 	import Leaderboard from '$lib/components/Leaderboard.svelte';
 	import PlayerProfile from '$lib/components/PlayerProfile.svelte';
 	import RoundAnnouncement from '$lib/components/RoundAnnouncement.svelte';
@@ -31,6 +32,7 @@
 	let selectedRound = 0;
 
 	let alreadySave = false;
+	let isOpenned = false;
 
 	//round Announcement
 	let displayAnnouncement = false;
@@ -220,22 +222,46 @@
 <main class="game-container">
 	{#if status == 'PLAY'}
 		{#key (rounds, players, selectedRound)}
-			<Leaderboard bind:status {rounds} {selectedRound} {players} bind:actualScore />
+			<Leaderboard bind:status {rounds} {selectedRound} {players} bind:score={actualScore} />
 		{/key}
 
 		<div class="round">
 			<h1>Round {1 + selectedRound}</h1>
-			<button
-				class="add-player"
-				class:disable={calculeMaxRound(players.length + 1) < rounds.length}
-				on:click={() => {
-					if (calculeMaxRound(players.length + 1) < rounds.length) {
-						return toast.error("You can't add more player at this point !");
-					}
-
-					status = 'NEW_PLAYER';
-				}}>+</button
-			>
+			<div class="button-container">
+				<button
+					class="add-player"
+					on:click={(e) => {
+						isOpenned = !isOpenned;
+					}}
+				>
+					{#if !isOpenned}
+						<svg
+							width="50px"
+							height="50px"
+							viewBox="0 0 1024 1024"
+							xmlns="http://www.w3.org/2000/svg"
+							><path
+								fill="var(--primary-50)"
+								d="M160 448a32 32 0 0 1-32-32V160.064a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32V416a32 32 0 0 1-32 32H160zm448 0a32 32 0 0 1-32-32V160.064a32 32 0 0 1 32-32h255.936a32 32 0 0 1 32 32V416a32 32 0 0 1-32 32H608zM160 896a32 32 0 0 1-32-32V608a32 32 0 0 1 32-32h256a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H160zm448 0a32 32 0 0 1-32-32V608a32 32 0 0 1 32-32h255.936a32 32 0 0 1 32 32v256a32 32 0 0 1-32 32H608z"
+							/></svg
+						>
+					{:else}
+						<svg
+							width="50px"
+							height="50px"
+							viewBox="0 0 1024 1024"
+							xmlns="http://www.w3.org/2000/svg"
+							><path
+								fill="var(--primary-50)"
+								d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z"
+							/></svg
+						>
+					{/if}
+				</button>
+				{#if isOpenned}
+					<ActionMenu bind:isOpenned bind:status />
+				{/if}
+			</div>
 		</div>
 
 		{#each rounds as round, index}
@@ -284,8 +310,15 @@
 		{#if displayAnnouncement}
 			<RoundAnnouncement bind:displayAnnouncement round={rounds.length} bind:timeoutAnnouncement />
 		{/if}
-	{:else if status == 'END' || status == 'LEADERBOARD'}
-		<EndLeaderboard {rounds} {selectedRound} {players} bind:status bind:alreadySave />
+	{:else if status == 'END' || status == 'LEADERBOARD' || status == 'EARLY_END'}
+		<FullPageLeaderboard
+			{totalRound}
+			{rounds}
+			{selectedRound}
+			{players}
+			bind:status
+			bind:alreadySave
+		/>
 	{:else if status == 'NEW_PLAYER'}
 		<div class="add-player" in:fade={{ duration: 700, easing: quintInOut, axis: 'x' }}>
 			<h1>Add New User</h1>
@@ -353,27 +386,33 @@
 			color: var(--primary-50) !important;
 		}
 
-		button.add-player {
-			background-color: var(--primary-500);
-			color: var(--primary-50);
-			width: 40px;
-			height: 40px;
-			border-radius: 5px;
-			border: none;
-			font-size: 1.8rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			transition: transform 0.2s;
+		.button-container {
+			position: relative;
 
-			&.disable {
-				background-color: var(--primary-100);
-				color: var(--primary-500);
-				cursor: not-allowed;
-			}
+			button.add-player {
+				background-color: var(--primary-500);
+				color: var(--primary-50);
+				width: 40px;
+				height: 40px;
+				border-radius: 5px;
+				border: none;
+				font-size: 1.8rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: transform 0.2s;
+				z-index: 10;
+				position: relative;
 
-			&:active {
-				transform: scale(1.2);
+				&.disable {
+					background-color: var(--primary-100);
+					color: var(--primary-500);
+					cursor: not-allowed;
+				}
+
+				&:active {
+					transform: scale(1.2);
+				}
 			}
 		}
 	}

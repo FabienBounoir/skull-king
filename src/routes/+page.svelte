@@ -1,12 +1,10 @@
 <script>
 	import myshades from '$lib/utils/myshades';
-	import { toast } from 'svelte-sonner';
 
 	let audio = null;
 
 	const playSound = () => {
 		if (!audio) {
-			toast.loading('Ah ah ah ah ah !');
 			audio = new Audio('/sounds/skull-king.mp3');
 			audio.play();
 		} else {

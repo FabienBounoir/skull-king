@@ -1,19 +1,20 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { api } from '$lib/utils/api';
+	import { calculeRoundPoints } from '$lib/utils/functionnality';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { quintOut } from 'svelte/easing';
 	import { fade, fly, slide } from 'svelte/transition';
 
 	export let players = [];
-	export let rounds = [];
+	export let rounds;
 	export let selectedRound = 0;
 	export let status;
 	export let alreadySave;
+	export let totalRound;
 
-	let scores = new Map();
-	let scoreArray = [];
+	let scores = [];
 	let top = {
 		0: '🥇',
 		1: '🥈',
@@ -21,79 +22,26 @@
 	};
 
 	const calculateScores = () => {
+		let usersScore = new Map();
+
 		for (let i = 0; i < rounds.length; i++) {
-			let round = rounds[i];
-			for (let player of round) {
-				if (!scores.has(player.player)) {
-					scores.set(player.player, 0);
-				}
+			if (status != 'END' && i == rounds.length - 1) break;
+			const round = rounds[i];
 
-				if (player.custom) {
-					scores.set(player.player, scores.get(player.player) + player.custom);
-					continue;
-				}
+			for (const player of round) {
+				const actualScore = usersScore.get(player.player) || 0;
 
-				let score = 0;
-				// player lose the bet
-				if (player.winTurn != player.betTurn) {
-					if (player.betTurn === 0) {
-						score -= (i + 1) * 10;
-					} else {
-						score -= Math.abs(player.winTurn - player.betTurn) * 10;
-					}
-
-					if (player.rascal > 0) {
-						score -= player.rascal;
-					}
-
-					scores.set(player.player, scores.get(player.player) + score);
-
-					continue;
-				}
-
-				if (player.winTurn === player.betTurn && player.winTurn > 0) {
-					score += player.winTurn * 20;
-				} else if (player.winTurn == 0 && player.betTurn == 0) {
-					score += (i + 1) * 10;
-				}
-
-				// player capture pirate with the skull king
-				if (player.capturePirate > 0) {
-					score += player.capturePirate * 30;
-				}
-
-				// player capture sirene with pirate
-				if (player.captureSirene > 0) {
-					score += player.captureSirene * 20;
-				}
-
-				// player capture skull king with sirene
-				if (player.captureSkullKing > 0) {
-					score += player.captureSkullKing * 40;
-				}
-
-				if (player.alliance > 0) {
-					score += player.alliance * 20;
-				}
-
-				if (player.bonus > 0) {
-					score += player.bonus;
-				}
-
-				if (player.rascal > 0) {
-					score += player.rascal;
-				}
-
-				scores.set(player.player, scores.get(player.player) + score);
+				const roundScore = calculeRoundPoints(player, i);
+				usersScore.set(player.player, actualScore + roundScore);
 			}
 		}
 
-		scoreArray = Array.from(scores.entries()).sort((a, b) => b[1] - a[1]);
-		saveGame(scoreArray);
+		scores = Array.from(usersScore.entries()).sort((a, b) => b[1] - a[1]);
+		saveGame(scores);
 	};
 
 	function saveGame(score) {
-		if (alreadySave || status != 'END') return;
+		if (alreadySave || !['END', 'EARLY_END'].includes(status)) return;
 		alreadySave = true;
 
 		api.post('/games', { team: 'soprasteria', score }).then((res) => {
@@ -122,7 +70,7 @@
 	class="end-leaderboard"
 	in:fly={{ duration: 300, easing: quintOut, x: 500 }}
 	on:click={() => {
-		if (status != 'END') {
+		if (status != 'END' && status != 'EARLY_END') {
 			status = 'PLAY';
 		}
 	}}
@@ -132,7 +80,7 @@
 	{/if}
 	<h2>LeaderBoard</h2>
 	<div class="players">
-		{#each scoreArray as [player, score], index}
+		{#each scores as [player, score], index}
 			<div
 				class:top1={index === 0}
 				class:top2={index === 1}
@@ -153,10 +101,13 @@
 				<p class:negative={score < 0}>{score} pts</p>
 			</div>
 		{/each}
+		{#if scores.length === 0}
+			<h3>No scores found</h3>
+		{/if}
 	</div>
 
 	<div class="actions" in:animate={{ fn: fade, forceAnimate: true, delay: 700 }}>
-		{#if status != 'END'}
+		{#if !['END', 'EARLY_END'].includes(status)}
 			<button on:click={() => (status = 'PLAY')}>Close</button>
 		{:else}
 			<button style="transform: rotate(180deg);width: 25%;" on:click={() => (status = 'PLAY')}
