@@ -50,6 +50,10 @@ class GameService {
 		});
 	}
 
+	async update(_id, score) {
+		return await this.#collection.updateOne({ _id: new ObjectId(_id) }, { $set: { score, winner: score[0][0] } });
+	}
+
 	/**
 	 * @param {string} _id
 	 */

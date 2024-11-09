@@ -201,7 +201,10 @@
 			text-align: center;
 			text-transform: uppercase;
 			margin: 0;
-			letter-spacing: 2px;
+
+			font-family: 'Cinzel', serif;
+			font-optical-sizing: auto;
+			font-weight: 600;
 		}
 
 		h3 {

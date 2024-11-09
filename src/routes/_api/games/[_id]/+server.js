@@ -6,22 +6,7 @@ import { error, json } from "@sveltejs/kit";
 /**
  * @type {import("./$types").RequestHandler}
  */
-export const GET = async ({ request }) => {
-	await connection;
-	try {
-		const games = await gameService.getAll("soprasteria");
-
-		return json(games.reverse());
-	}
-	catch (e) {
-		return json({ error: e.message }, { status: 500 });
-	}
-};
-
-/**
- * @type {import("./$types").RequestHandler}
- */
-export const POST = async ({ request }) => {
+export const PUT = async ({ request, params }) => {
 	try {
 		const { score, team } = await request.json();
 
@@ -29,12 +14,12 @@ export const POST = async ({ request }) => {
 			throw error(404, { id: "request.invalid", message: "Invalid request" });
 		}
 
-		const game = await gameService.create(score, team);
+		const game = await gameService.update(params._id, score);
 
 		if (score && score.length > 0) {
 			let promises = [];
 			for (let i = 0; i < score.length; i++) {
-				promises.push(playerService.addUserScore(score[i][0], score[i][1], i == 0, "soprasteria", game.insertedId));
+				promises.push(playerService.updateUserScore(score[i][0], score[i][1], i == 0, "soprasteria", params._id));
 			}
 
 			await Promise.all(promises);

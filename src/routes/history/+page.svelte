@@ -245,5 +245,11 @@
 
 	p {
 		color: var(--primary-500);
+
+		span {
+			font-family: 'Cinzel', serif;
+			font-optical-sizing: auto;
+			font-weight: 600;
+		}
 	}
 </style>

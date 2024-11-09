@@ -80,8 +80,10 @@
 	}
 
 	.leaderboard p {
+		font-family: 'Cinzel', serif;
+		font-optical-sizing: auto;
+		font-weight: 600;
 		margin: 0;
-		letter-spacing: 2px;
 	}
 
 	.leaderboard h1 {

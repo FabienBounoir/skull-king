@@ -11,8 +11,9 @@
 	export let rounds;
 	export let selectedRound = 0;
 	export let status;
-	export let alreadySave;
 	export let totalRound;
+
+	export let idGame = null;
 
 	let scores = [];
 	let top = {
@@ -41,12 +42,18 @@
 	};
 
 	function saveGame(score) {
-		if (alreadySave || !['END', 'EARLY_END'].includes(status)) return;
-		alreadySave = true;
+		if (!['END', 'EARLY_END'].includes(status)) return;
 
-		api.post('/games', { team: 'soprasteria', score }).then((res) => {
-			toast.info('Game saved !');
-		});
+		if (idGame) {
+			api.put(`/games/${idGame}`, { team: 'soprasteria', score }).then(() => {
+				toast.info('Statistiques mises à jour !');
+			});
+		} else {
+			api.post(`/games`, { team: 'soprasteria', score }).then((res) => {
+				toast.info('Game saved !');
+				idGame = res.insertedId;
+			});
+		}
 	}
 
 	function animate(node, options) {
@@ -140,6 +147,12 @@
 			color: var(--primary-50);
 		}
 
+		h3 {
+			font-family: 'Cinzel', serif;
+			font-optical-sizing: auto;
+			font-weight: 600;
+		}
+
 		button {
 			font-size: 1.5rem;
 		}
@@ -171,6 +184,9 @@
 		display: flex;
 		flex-direction: row;
 		gap: 5px;
+		font-family: 'Cinzel', serif;
+		font-optical-sizing: auto;
+		font-weight: 600;
 
 		&.negative {
 			color: red;
@@ -182,6 +198,10 @@
 			display: flex;
 			justify-content: center;
 			font-weight: bold;
+
+			font-family: 'Cinzel', serif;
+			font-optical-sizing: auto;
+			font-weight: 900;
 		}
 	}
 

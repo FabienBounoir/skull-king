@@ -31,8 +31,9 @@
 	let status = 'INIT';
 	let selectedRound = 0;
 
-	let alreadySave = false;
 	let isOpenned = false;
+
+	let idGame = null;
 
 	//round Announcement
 	let displayAnnouncement = false;
@@ -311,14 +312,7 @@
 			<RoundAnnouncement bind:displayAnnouncement round={rounds.length} bind:timeoutAnnouncement />
 		{/if}
 	{:else if status == 'END' || status == 'LEADERBOARD' || status == 'EARLY_END'}
-		<FullPageLeaderboard
-			{totalRound}
-			{rounds}
-			{selectedRound}
-			{players}
-			bind:status
-			bind:alreadySave
-		/>
+		<FullPageLeaderboard {totalRound} {rounds} {selectedRound} {players} bind:status bind:idGame />
 	{:else if status == 'NEW_PLAYER'}
 		<div class="add-player" in:fade={{ duration: 700, easing: quintInOut, axis: 'x' }}>
 			<h1>Add New User</h1>

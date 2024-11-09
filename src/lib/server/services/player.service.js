@@ -79,7 +79,7 @@ class PlayerService {
 		});
 	}
 
-	async addUserScore(name, score, winner, team = "soprasteria") {
+	async addUserScore(name, score, winner, team = "soprasteria", gameId) {
 		let playerInfo = await this.#collection.findOne({ name, team });
 
 		if (!playerInfo) {
@@ -91,7 +91,7 @@ class PlayerService {
 			return console.error("Error creating user");
 		}
 
-		const history = [...playerInfo.history, { score, winner, date: new Date() }];
+		const history = [...playerInfo.history, { score, winner, date: new Date(), gameId: gameId.toString() }];
 		if (winner) {
 			playerInfo.win++;
 		}
@@ -118,7 +118,66 @@ class PlayerService {
 				history,
 				win: playerInfo.win,
 				maxScore: playerInfo.maxScore,
-				lowerScore: playerInfo.lowerScore
+				lowerScore: playerInfo.lowerScore,
+				date: new Date()
+			}
+		});
+	}
+
+	async updateUserScore(name, score, winner, team = "soprasteria", gameId) {
+		let playerInfo = await this.#collection.findOne({ name, team });
+
+		if (!playerInfo) {
+			return console.error("Error user not found");
+		}
+
+		//find gameId and update
+		for (let i = 0; i < playerInfo.history.length; i++) {
+			if (playerInfo.history[i].gameId == gameId) {
+				playerInfo.history[i].score = score;
+				playerInfo.history[i].winner = winner;
+				playerInfo.history[i].date = new Date();
+			}
+		}
+
+		//update max and lower score
+		playerInfo.maxScore = null
+		playerInfo.lowerScore = null
+
+		for (let i = 0; i < playerInfo.history.length; i++) {
+			if (!playerInfo.maxScore) {
+				playerInfo.maxScore = playerInfo.history[i].score;
+			}
+
+			if (!playerInfo.lowerScore) {
+				playerInfo.lowerScore = playerInfo.history[i].score;
+			}
+
+			if (playerInfo.history[i].score > playerInfo.maxScore) {
+				playerInfo.maxScore = playerInfo.history[i].score;
+			}
+
+			if (playerInfo.history[i].score < playerInfo.lowerScore) {
+				playerInfo.lowerScore = playerInfo.history[i].score;
+			}
+		}
+
+		//update win
+		playerInfo.win = 0
+		for (let i = 0; i < playerInfo.history.length; i++) {
+			if (playerInfo.history[i].winner) {
+				playerInfo.win++;
+			}
+		}
+
+
+		await this.#collection.updateOne({ name, team }, {
+			$set: {
+				history: playerInfo.history,
+				win: playerInfo.win,
+				maxScore: playerInfo.maxScore,
+				lowerScore: playerInfo.lowerScore,
+				date: new Date()
 			}
 		});
 	}
