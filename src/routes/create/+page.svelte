@@ -35,7 +35,12 @@
 	}
 
 	function formatName(name) {
-		return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+		return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase().trim();
+	}
+
+	function rotateArrayRandomly(array) {
+		const randomIndex = Math.floor(Math.random() * array.length);
+		return [...array.slice(randomIndex), ...array.slice(0, randomIndex)];
 	}
 </script>
 
@@ -140,7 +145,7 @@
 				localStorage.removeItem('rounds');
 				localStorage.removeItem('selectedRound');
 
-				localStorage.setItem('players', JSON.stringify(players));
+				localStorage.setItem('players', JSON.stringify(rotateArrayRandomly(players)));
 				goto('/game');
 			}}>Start Game</button
 		>

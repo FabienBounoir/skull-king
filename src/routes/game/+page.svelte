@@ -365,6 +365,41 @@
 				>
 			</div>
 		</div>
+	{:else if status == 'REMOVE_PLAYER'}
+		<div class="add-player" in:fade={{ duration: 700, easing: quintInOut, axis: 'x' }}>
+			<h1>Remove User</h1>
+
+			<div class="remove-player-list">
+				{#each players as player, index}
+					<div class="remove-player">
+						<label for={player}>{player}</label>
+
+						<button
+							on:click={() => {
+								players = players.filter((p) => p !== player);
+
+								let tempRound = [];
+
+								for (let round of rounds) {
+									tempRound.push(round.filter((p) => p.player !== player));
+								}
+
+								rounds = [...tempRound];
+							}}>❌</button
+						>
+					</div>
+				{/each}
+			</div>
+
+			<div class="navigation" style="width: 100%;">
+				<button
+					style="font-size: 1.5rem;"
+					on:click={() => {
+						status = 'PLAY';
+					}}>Close</button
+				>
+			</div>
+		</div>
 	{/if}
 </main>
 
@@ -430,6 +465,40 @@
 		h1 {
 			color: var(--primary-50) !important;
 		}
+
+		.remove-player-list {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			width: 100%;
+
+			.remove-player {
+				background-color: var(--primary-500);
+				color: var(--primary-50);
+				padding: 10px;
+				border-radius: 5px;
+				border: none;
+				cursor: pointer;
+				transition: transform 0.2s;
+
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+
+				button {
+					color: var(--primary-50);
+					padding: 10px;
+					border-radius: 5px;
+					border: none;
+					cursor: pointer;
+					transition: transform 0.2s;
+
+					&:active {
+						transform: scale(1.1);
+					}
+				}
+			}
+		}
 	}
 
 	.add-player-info {
@@ -488,7 +557,7 @@
 		justify-content: center;
 		gap: 10px;
 		position: sticky;
-		bottom: 25px;
+		bottom: 30px;
 		min-height: 50px;
 		padding: 0 2.5vw;
 		margin: 10px 0 0 0;

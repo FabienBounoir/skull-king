@@ -8,8 +8,10 @@ import { error, json } from "@sveltejs/kit";
  */
 export const GET = async ({ request }) => {
 	await connection;
+
 	try {
-		const games = await gameService.getAll("soprasteria");
+		const url = new URL(request?.url);
+		const games = await gameService.getAll(url?.searchParams?.get?.("team") || "default");
 
 		return json(games.reverse());
 	}
@@ -34,7 +36,7 @@ export const POST = async ({ request }) => {
 		if (score && score.length > 0) {
 			let promises = [];
 			for (let i = 0; i < score.length; i++) {
-				promises.push(playerService.addUserScore(score[i][0], score[i][1], i == 0, "soprasteria", game.insertedId));
+				promises.push(playerService.addUserScore(score[i][0], score[i][1], i == 0, team || "default", game.insertedId));
 			}
 
 			await Promise.all(promises);

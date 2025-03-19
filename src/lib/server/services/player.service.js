@@ -25,7 +25,7 @@ class PlayerService {
 	async getAll(team) {
 		let users = await this.#collection.aggregate([
 			{
-				$match: { team }
+				$match: { team, date: { $gte: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000) } }
 			},
 			{
 				$addFields: {
@@ -75,11 +75,18 @@ class PlayerService {
 			win: 0,
 			history: [],
 			maxScore: null,
-			lowerScore: null
+			lowerScore: null,
+			date: new Date()
 		});
 	}
 
-	async addUserScore(name, score, winner, team = "soprasteria", gameId) {
+	formatName(name) {
+		return name.charAt(0).toUpperCase() + name.slice(1).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+	}
+
+	async addUserScore(name, score, winner, team = "default", gameId) {
+		name = this.formatName(name);
+
 		let playerInfo = await this.#collection.findOne({ name, team });
 
 		if (!playerInfo) {
@@ -124,7 +131,7 @@ class PlayerService {
 		});
 	}
 
-	async updateUserScore(name, score, winner, team = "soprasteria", gameId) {
+	async updateUserScore(name, score, winner, team = "default", gameId) {
 		let playerInfo = await this.#collection.findOne({ name, team });
 
 		if (!playerInfo) {

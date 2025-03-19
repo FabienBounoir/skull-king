@@ -1,5 +1,6 @@
 <script>
 	import myshades from '$lib/utils/myshades';
+	import { onMount } from 'svelte';
 
 	let audio = null;
 

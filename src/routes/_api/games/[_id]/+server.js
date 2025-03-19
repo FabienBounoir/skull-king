@@ -19,7 +19,7 @@ export const PUT = async ({ request, params }) => {
 		if (score && score.length > 0) {
 			let promises = [];
 			for (let i = 0; i < score.length; i++) {
-				promises.push(playerService.updateUserScore(score[i][0], score[i][1], i == 0, "soprasteria", params._id));
+				promises.push(playerService.updateUserScore(score[i][0], score[i][1], i == 0, team || 'default', params._id));
 			}
 
 			await Promise.all(promises);

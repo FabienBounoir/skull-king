@@ -28,6 +28,12 @@
 		}}>Add New User</button
 	>
 	<button
+		on:click={() => {
+			status = 'REMOVE_PLAYER';
+			isOpenned = false;
+		}}>Remove User</button
+	>
+	<button
 		class:confirm={validEndGame}
 		on:click={() => {
 			if (!validEndGame) {

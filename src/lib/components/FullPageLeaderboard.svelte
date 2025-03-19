@@ -44,12 +44,14 @@
 	function saveGame(score) {
 		if (!['END', 'EARLY_END'].includes(status)) return;
 
+		const team = window.localStorage.getItem('team-name');
+
 		if (idGame) {
-			api.put(`/games/${idGame}`, { team: 'soprasteria', score }).then(() => {
+			api.put(`/games/${idGame}`, { team: team || 'default', score }).then(() => {
 				toast.info('Statistiques mises à jour !');
 			});
 		} else {
-			api.post(`/games`, { team: 'soprasteria', score }).then((res) => {
+			api.post(`/games`, { team: team || 'default', score }).then((res) => {
 				toast.info('Game saved !');
 				idGame = res.insertedId;
 			});
@@ -159,7 +161,7 @@
 
 		.actions {
 			position: fixed;
-			bottom: 10px;
+			bottom: 20px;
 			left: 50%;
 			transform: translateX(-50%);
 			display: flex;

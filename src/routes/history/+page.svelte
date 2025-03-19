@@ -9,6 +9,8 @@
 	let users = [];
 	let games = [];
 
+	let teamName = 'default';
+
 	const timeFormater = (date) => {
 		const time = new Date(date).getTime();
 
@@ -22,11 +24,15 @@
 	};
 
 	const getData = async () => {
-		games = api.get('/games');
-		users = api.get('/players');
+		games = api.get('/games?team=' + teamName);
+		users = api.get('/players?team=' + teamName);
 	};
 
 	onMount(() => {
+		if (window.localStorage?.getItem?.('team-name')) {
+			teamName = window.localStorage.getItem('team-name');
+		}
+
 		getData();
 	});
 </script>
@@ -119,6 +125,10 @@
 					</div>
 				</div>
 			{/each}
+
+			{#if games.length === 0}
+				<p>No game found</p>
+			{/if}
 		{/await}
 
 		{#if games.length === 0}

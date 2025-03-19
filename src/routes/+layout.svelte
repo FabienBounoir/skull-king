@@ -5,11 +5,19 @@
 	import '@fortawesome/fontawesome-free/css/all.min.css';
 
 	let loading = true;
+	let hasTeamName = false;
+
+	let inputData = '';
+
 	setTimeout(() => {
 		loading = false;
 	}, 2000);
 
 	onMount(() => {
+		if (window.localStorage?.getItem?.('team-name')) {
+			hasTeamName = true;
+		}
+
 		document.addEventListener(
 			'dblclick',
 			function (event) {
@@ -18,6 +26,13 @@
 			{ passive: false }
 		);
 	});
+
+	const setTeamName = () => {
+		if (inputData) {
+			window.localStorage.setItem('team-name', inputData);
+			hasTeamName = true;
+		}
+	};
 </script>
 
 <Toaster position="top-center" richColors />
@@ -28,12 +43,54 @@
 	</div>
 {/if}
 
-<slot />
+{#if hasTeamName}
+	<slot />
+{:else}
+	<div class="main-container">
+		<h1>Enter your team name</h1>
+		<input type="text" placeholder="Team Name" bind:value={inputData} />
+		<button
+			on:click={() => {
+				setTeamName();
+			}}>Submit</button
+		>
+	</div>
+{/if}
 
 <style lang="scss">
 	.main-container {
-		padding: 5px;
-		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		min-height: 100dvh;
+
+		color: var(--primary-50);
+		gap: 20px;
+
+		input {
+			padding: 10px;
+			border-radius: 5px;
+			border: 1px solid var(--primary-500);
+			font-size: 1.2rem;
+			width: 90%;
+		}
+
+		button {
+			background-color: var(--primary-500);
+			color: var(--primary-50);
+			padding: 10px 20px;
+			border-radius: 5px;
+			width: 90%;
+			font-size: 1.5rem;
+			border: none;
+			cursor: pointer;
+			transition: transform 0.2s;
+
+			&:active {
+				transform: scale(1.1);
+			}
+		}
 	}
 
 	.loader {
