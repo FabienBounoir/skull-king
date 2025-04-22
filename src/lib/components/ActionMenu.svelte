@@ -1,9 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
 	import { quintOut } from 'svelte/easing';
-	import { fade, fly, scale } from 'svelte/transition';
+	import { fade, fly } from 'svelte/transition';
 	export let isOpenned;
 	export let status;
+	export let bidsDisplay = true;
 
 	let validEndGame = false;
 
@@ -33,6 +34,20 @@
 			isOpenned = false;
 		}}>Remove User</button
 	>
+	{#if bidsDisplay}
+		<button
+			on:click={() => {
+				bidsDisplay = false;
+			}}>bids hidden</button
+		>
+	{:else}
+		<button
+			on:click={() => {
+				bidsDisplay = true;
+			}}>bids shown</button
+		>
+	{/if}
+
 	<button
 		class:confirm={validEndGame}
 		on:click={() => {
