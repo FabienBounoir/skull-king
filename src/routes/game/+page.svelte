@@ -27,6 +27,7 @@
 
 	/** @type {Array<PlayerRound>} */
 	let players = [];
+	let bidsDisplay = true
 	let rounds = [];
 	let status = 'INIT';
 	let selectedRound = 0;
@@ -70,6 +71,7 @@
 	onMount(() => {
 		try {
 			players = JSON.parse(localStorage.getItem('players'));
+			bidsDisplay = localStorage.getItem('bidsConfig') == "false" ? false : true
 
 			if (localStorage.getItem('rounds') && localStorage.getItem('selectedRound')) {
 				rounds = JSON.parse(localStorage.getItem('rounds'));
@@ -268,7 +270,7 @@
 		{#each rounds as round, index}
 			{#if index === selectedRound}
 				{#each round as player}
-					<PlayerProfile {player} {index} />
+					<PlayerProfile {player} {index} {bidsDisplay}/>
 				{/each}
 			{/if}
 		{/each}

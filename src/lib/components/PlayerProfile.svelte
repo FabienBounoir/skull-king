@@ -24,6 +24,20 @@
 	/** @type {PlayerRound} */
 	export let player = {};
 	export let index = 0;
+	export let bidsDisplay = true;
+
+	const updateBet = (betTurn, number) =>{
+		if(number < 0){
+			betTurn = 0
+		}
+		else if(index + 1 < number){
+			betTurn = index + 1
+		}
+		else{
+			betTurn = number
+		}
+
+	}
 </script>
 
 <main class="profile" class:disable={player.custom}>
@@ -32,12 +46,22 @@
 	</h2>
 	<h3>Bids</h3>
 	<div class="bids">
-		<button class:selected={player.betTurn == 0} on:click={() => (player.betTurn = 0)}>{0}</button>
-		{#each Array.from({ length: index + 1 }) as _, i}
-			<button class:selected={player.betTurn == i + 1} on:click={() => (player.betTurn = i + 1)}
-				>{i + 1}</button
+		{#if bidsDisplay}
+			<button class:selected={player.betTurn == 0} on:click={() => (player.betTurn = 0)}>{0}</button>
+			{#each Array.from({ length: index + 1 }) as _, i}
+				<button class:selected={player.betTurn == i + 1} on:click={() => (player.betTurn = i + 1)}
+					>{i + 1}</button
+				>
+			{/each}
+		{:else}
+			<button on:click={() => (updateBet(player.betTurn, player.betTurn - 1))}
+				>-1</button
 			>
-		{/each}
+			<button  on:click={() => (updateBet(player.betTurn, player.betTurn + 1))}
+				>+1</button
+			>
+			{player.betTurn}
+		{/if}
 	</div>
 
 	<h3>Tricks won</h3>
