@@ -4,8 +4,6 @@
 	import Mermaid from '$lib/icons/Mermaid.svelte';
 	import Skull from '$lib/icons/Skull.svelte';
 	import Sword from '$lib/icons/Sword.svelte';
-	import { info } from 'sass';
-	import { toast } from 'svelte-sonner';
 
 	/**
 	 * Représente un joueur dans un nouveau tour.
@@ -19,29 +17,56 @@
 	 * @property {number} bonus - Bonus accumulé.
 	 * @property {number} rascal - Compte des rascal.
 	 * @property {number} alliance - Score d'alliance.
+	 * @property {boolean} alreadySaved - Indique si le joueur a déjà enregistré ses mises.
 	 */
 
 	/** @type {PlayerRound} */
 	export let player = {};
 	export let index = 0;
+	export let bidsDisplay = true;
+
+	const updateBet = (number) => {
+		if (number < 0) {
+			player.betTurn = 0;
+		} else if (index + 1 < number) {
+			player.betTurn = index + 1;
+		} else {
+			player.betTurn = number;
+		}
+	};
 </script>
 
 <main class="profile" class:disable={player.custom}>
-	<h2 class:rainbow={['bouns', 'fab', 'fabien'].includes(player?.player?.toLowerCase?.())}>
+	<h2
+		on:click={() => {
+			player.alreadySaved = !player.alreadySaved;
+		}}
+		class:rainbow={['bouns', 'fab', 'fabien'].includes(player?.player?.toLowerCase?.())}
+	>
 		{player.player}
 	</h2>
 	<h3>Bids</h3>
 	<div class="bids">
-		<button class:selected={player.betTurn == 0} on:click={() => (player.betTurn = 0)}>{0}</button>
-		{#each Array.from({ length: index + 1 }) as _, i}
-			<button class:selected={player.betTurn == i + 1} on:click={() => (player.betTurn = i + 1)}
-				>{i + 1}</button
+		{#if bidsDisplay || !player.alreadySaved}
+			<button class:selected={player.betTurn == 0} on:click={() => (player.betTurn = 0)}>{0}</button
 			>
-		{/each}
+			{#each Array.from({ length: index + 1 }) as _, i}
+				<button class:selected={player.betTurn == i + 1} on:click={() => (player.betTurn = i + 1)}
+					>{i + 1}</button
+				>
+			{/each}
+
+			{#if !bidsDisplay}
+				<button class="validate" on:click={() => (player.alreadySaved = true)}> ✔ </button>
+			{/if}
+		{:else}
+			<button on:click={() => updateBet(player.betTurn - 1)}>-1</button>
+			<button on:click={() => updateBet(player.betTurn + 1)}>+1</button>
+		{/if}
 	</div>
 
 	<h3>Tricks won</h3>
-	<div class="bids">
+	<div class="bids" class:disable={!bidsDisplay && !player.alreadySaved}>
 		<button class:selected={player.winTurn == 0} on:click={() => (player.winTurn = 0)}>{0}</button>
 		{#each Array.from({ length: index + 1 }) as _, i}
 			<button class:selected={player.winTurn == i + 1} on:click={() => (player.winTurn = i + 1)}
@@ -51,7 +76,7 @@
 	</div>
 
 	<h3>Bonus points</h3>
-	<div class="bonus">
+	<div class="bonus" class:disable={!bidsDisplay && !player.alreadySaved}>
 		<button
 			class:used={player.capturePirate > 0}
 			on:click={() => {
@@ -155,6 +180,16 @@
 </main>
 
 <style lang="scss">
+	.bids,
+	.bonus {
+		&.disable {
+			button {
+				pointer-events: none;
+				filter: grayscale(1) brightness(0.7);
+			}
+		}
+	}
+
 	.profile {
 		display: flex;
 		flex-direction: column;
@@ -222,6 +257,24 @@
 		flex-direction: row;
 		gap: 10px;
 		flex-wrap: wrap;
+
+		.validate {
+			background-color: green;
+			color: #fff;
+			font-size: 1.5rem;
+			width: 40px;
+			height: 40px;
+			border-radius: 5px;
+			border: none;
+			font-weight: bold;
+			aspect-ratio: 1;
+			font-family: system-ui !important;
+			transition: transform 0.2s;
+
+			&:active {
+				transform: scale(1.2);
+			}
+		}
 	}
 
 	.bids button {

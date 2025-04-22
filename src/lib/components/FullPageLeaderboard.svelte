@@ -106,6 +106,9 @@
 			>
 				<p>
 					<span>{top[index] || index + 1}</span>{player}
+					{#if player == 'Nadir' && index == scores.length - 1}
+						💩
+					{/if}
 				</p>
 				<p class:negative={score < 0}>{score} pts</p>
 			</div>

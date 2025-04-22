@@ -27,6 +27,7 @@
 
 	/** @type {Array<PlayerRound>} */
 	let players = [];
+	let bidsDisplay = true;
 	let rounds = [];
 	let status = 'INIT';
 	let selectedRound = 0;
@@ -70,6 +71,7 @@
 	onMount(() => {
 		try {
 			players = JSON.parse(localStorage.getItem('players'));
+			bidsDisplay = localStorage.getItem('bidsConfig') == 'false' ? false : true;
 
 			if (localStorage.getItem('rounds') && localStorage.getItem('selectedRound')) {
 				rounds = JSON.parse(localStorage.getItem('rounds'));
@@ -102,7 +104,8 @@
 				captureSkullKing: 0,
 				bonus: 0,
 				rascal: 0,
-				alliance: 0
+				alliance: 0,
+				alreadySaved: false
 			});
 		}
 
@@ -183,6 +186,7 @@
 					bonus: 0,
 					rascal: 0,
 					alliance: 0,
+					alreadySaved: false,
 					custom: score
 				});
 			} else if (i == rounds.length - 1) {
@@ -195,7 +199,8 @@
 					captureSkullKing: 0,
 					bonus: 0,
 					rascal: 0,
-					alliance: 0
+					alliance: 0,
+					alreadySaved: false
 				});
 			}
 
@@ -260,7 +265,7 @@
 					{/if}
 				</button>
 				{#if isOpenned}
-					<ActionMenu bind:isOpenned bind:status />
+					<ActionMenu bind:isOpenned bind:status bind:bidsDisplay />
 				{/if}
 			</div>
 		</div>
@@ -268,7 +273,7 @@
 		{#each rounds as round, index}
 			{#if index === selectedRound}
 				{#each round as player}
-					<PlayerProfile {player} {index} />
+					<PlayerProfile {player} {index} {bidsDisplay} />
 				{/each}
 			{/if}
 		{/each}
@@ -544,7 +549,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 10px;
-		margin-bottom: 30px;
 
 		h1 {
 			margin-bottom: 0;
@@ -557,10 +561,11 @@
 		justify-content: center;
 		gap: 10px;
 		position: sticky;
-		bottom: 30px;
+		bottom: 0;
 		min-height: 50px;
-		padding: 0 2.5vw;
+		padding: 10px 2.5vw 30px 2.5vw;
 		margin: 10px 0 0 0;
+		backdrop-filter: blur(10px);
 	}
 
 	.navigation button {

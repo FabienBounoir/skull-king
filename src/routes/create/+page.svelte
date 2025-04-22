@@ -11,6 +11,7 @@
 
 	let oldGameExists = false;
 	let totalRound = 10;
+	let bitsDisplay = true;
 
 	onMount(() => {
 		players = JSON.parse(localStorage.getItem('players')) || [];
@@ -70,7 +71,18 @@
 
 <div class="main-container">
 	<div class="players">
-		<h2>Players</h2>
+		<div class="header">
+			<h2>Players</h2>
+			{#if bitsDisplay}
+				<button
+					on:click={() =>{bitsDisplay = false}}
+				>Bids Display</button>
+			{:else}
+				<button
+					on:click={() =>{bitsDisplay = true}}
+				>Bids Hidden</button>
+			{/if}
+		</div>
 
 		{#each players as player, i}
 			<div class="player" in:scale>
@@ -146,6 +158,7 @@
 				localStorage.removeItem('selectedRound');
 
 				localStorage.setItem('players', JSON.stringify(rotateArrayRandomly(players)));
+				localStorage.setItem('bidsConfig', bitsDisplay);
 				goto('/game');
 			}}>Start Game</button
 		>
@@ -163,6 +176,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
+		width:100%;
 
 		button {
 			padding: 10px 20px;
