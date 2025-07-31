@@ -61,7 +61,27 @@ class PlayerService {
 	 * @returns 
 	 */
 	getByName(team, name) {
-		return this.#collection.findOne({ team, name });
+		// Format the name to match the stored format
+		const formattedName = this.formatName(name);
+		return this.#collection.findOne({ team, name: formattedName });
+	}
+
+	/**
+	 * Get player with full history for profile page
+	 * @param {String} team 
+	 * @param {String} name 
+	 * @returns 
+	 */
+	async getByNameWithHistory(team, name) {
+		const formattedName = this.formatName(name);
+		const player = await this.#collection.findOne({ team, name: formattedName });
+		
+		if (player && player.history) {
+			// Add total games count
+			player.totalGame = player.history.length;
+		}
+		
+		return player;
 	}
 
 	/**

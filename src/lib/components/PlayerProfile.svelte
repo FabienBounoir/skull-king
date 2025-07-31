@@ -16,7 +16,7 @@
 	 * @property {number} captureSkullKing - Nombre de Skull Kings capturés.
 	 * @property {number} bonus - Bonus accumulé.
 	 * @property {number} rascal - Compte des rascal.
-	 * @property {number} alliance - Score d'alliance.
+	 * @property {Array<string>} alliances - Tableau des noms des partenaires d'alliance.
 	 * @property {boolean} alreadySaved - Indique si le joueur a déjà enregistré ses mises.
 	 */
 
@@ -24,6 +24,8 @@
 	export let player = {};
 	export let index = 0;
 	export let bidsDisplay = true;
+	export let onTricksChange = null; // Callback pour notifier les changements
+	export let onAllianceClick = null; // Callback pour gérer les alliances
 
 	const updateBet = (number) => {
 		if (number < 0) {
@@ -67,10 +69,20 @@
 
 	<h3>Tricks won</h3>
 	<div class="bids" class:disable={!bidsDisplay && !player.alreadySaved}>
-		<button class:selected={player.winTurn == 0} on:click={() => (player.winTurn = 0)}>{0}</button>
+		<button
+			class:selected={player.winTurn == 0}
+			on:click={() => {
+				player.winTurn = 0;
+				onTricksChange && onTricksChange();
+			}}>{0}</button
+		>
 		{#each Array.from({ length: index + 1 }) as _, i}
-			<button class:selected={player.winTurn == i + 1} on:click={() => (player.winTurn = i + 1)}
-				>{i + 1}</button
+			<button
+				class:selected={player.winTurn == i + 1}
+				on:click={() => {
+					player.winTurn = i + 1;
+					onTricksChange && onTricksChange();
+				}}>{i + 1}</button
 			>
 		{/each}
 	</div>
@@ -162,18 +174,23 @@
 		</button>
 
 		<button
-			class:used={player.alliance > 0}
+			class:used={player.alliances && player.alliances.length > 0}
 			on:click={() => {
-				player.alliance++;
-				if (player.alliance > 2) {
-					player.alliance = 0;
+				if (onAllianceClick) {
+					onAllianceClick();
+				} else {
+					// Fallback à l'ancien comportement si onAllianceClick n'est pas défini
+					if (!player.alliances) {
+						player.alliances = [];
+					}
+					// Ce fallback n'est plus utilisé avec le nouveau système
 				}
 			}}
 		>
 			<Deal />
 
 			<div class="tooltip">
-				<span class="tooltiptext">{player.alliance}</span>
+				<span class="tooltiptext">{player.alliances ? player.alliances.length : 0}</span>
 			</div>
 		</button>
 	</div>
