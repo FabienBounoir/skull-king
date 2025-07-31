@@ -31,7 +31,7 @@
 			const round = rounds[i];
 			for (let player of round) {
 				const actualScore = usersScore.get(player.player) || 0;
-				const roundScore = calculeRoundPoints(player, i);
+				const roundScore = calculeRoundPoints(player, i, round);
 				usersScore.set(player.player, actualScore + roundScore);
 			}
 		}

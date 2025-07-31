@@ -32,7 +32,7 @@
 			for (const player of round) {
 				const actualScore = usersScore.get(player.player) || 0;
 
-				const roundScore = calculeRoundPoints(player, i);
+				const roundScore = calculeRoundPoints(player, i, round);
 				usersScore.set(player.player, actualScore + roundScore);
 			}
 		}
@@ -48,11 +48,11 @@
 
 		if (idGame) {
 			api.put(`/games/${idGame}`, { team: team || 'default', score }).then(() => {
-				toast.info('Statistiques mises à jour !');
+				toast.info('Statistics updated!');
 			});
 		} else {
 			api.post(`/games`, { team: team || 'default', score }).then((res) => {
-				toast.info('Game saved !');
+				toast.info('Game saved!');
 				idGame = res.insertedId;
 			});
 		}
@@ -129,7 +129,7 @@
 			<button
 				on:click={() => {
 					goto('/');
-				}}>New Game</button
+				}}>Home</button
 			>
 		{/if}
 	</div>

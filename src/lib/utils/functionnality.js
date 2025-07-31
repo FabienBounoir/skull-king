@@ -10,7 +10,7 @@ export function calculeMaxRound(usersCount, totalRound = 10) {
     return totalRound;
 }
 
-export function calculeRoundPoints(player, roundId) {
+export function calculeRoundPoints(player, roundId, allPlayersInRound = []) {
     if (player.custom) {
         return player.custom;
     }
@@ -54,8 +54,27 @@ export function calculeRoundPoints(player, roundId) {
         roundScore += player.captureSkullKing * 40;
     }
 
-    if (player.alliance > 0) {
-        roundScore += player.alliance * 20;
+    // Calcul des points d'alliance avec vérification des partenaires
+    if (player.alliances && player.alliances.length > 0 && allPlayersInRound.length > 0) {
+        // Vérifier si ce joueur a réussi son pari
+        const playerSuccessfulBet = player.winTurn === player.betTurn;
+
+        if (playerSuccessfulBet) {
+            let validAlliances = 0;
+
+            // Vérifier chaque alliance individuellement
+            for (const allyName of player.alliances) {
+                const ally = allPlayersInRound.find(p => p.player === allyName);
+
+                // Si l'allié existe et a réussi son pari, cette alliance compte
+                if (ally && ally.winTurn === ally.betTurn) {
+                    validAlliances++;
+                }
+            }
+
+            roundScore += validAlliances * 20;
+        }
+        // Si le joueur a échoué son pari, il ne reçoit aucun point d'alliance
     }
 
     if (player.bonus > 0) {
