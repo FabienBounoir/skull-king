@@ -74,8 +74,16 @@
 		{:then users}
 			{#each users as user, index}
 				<div
-					class="player"
+					class="player clickable"
 					class:rainbow={['fabien', 'bouns', 'fab'].includes(user.name.toLowerCase())}
+					on:click={() => goto(`/player/${user.name}`)}
+					on:keydown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							goto(`/player/${user.name}`);
+						}
+					}}
+					tabindex="0"
+					role="button"
 				>
 					<p><span>➜ {user.name} </span></p>
 					<div>
@@ -202,6 +210,26 @@
 		border-radius: 5px;
 		text-transform: uppercase;
 		width: 90vw;
+		transition: all 0.2s ease;
+
+		&.clickable {
+			cursor: pointer;
+
+			&:hover {
+				background-color: var(--primary-200);
+				transform: translateY(-1px);
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			&:active {
+				transform: translateY(0);
+			}
+
+			&:focus {
+				outline: 2px solid var(--primary-500);
+				outline-offset: 2px;
+			}
+		}
 
 		&.skeleton {
 			span {
