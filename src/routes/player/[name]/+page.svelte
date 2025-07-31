@@ -100,7 +100,7 @@
 
 				<div class="stat-card">
 					<div class="stat-icon">
-						<i class="fa-solid fa-chart-line-down"></i>
+						<i class="fa-solid fa-angles-down"></i>
 					</div>
 					<div class="stat-content">
 						<h3>Score min</h3>
@@ -140,11 +140,23 @@
 				<div class="games-list">
 					{#each playerData.history.sort((a, b) => new Date(b.date) - new Date(a.date)) as game, index}
 						<div
-							class="game-card"
+							class="game-card clickable"
 							class:victory={game.winner}
 							class:rainbow={['fabien', 'bouns', 'fab'].includes(playerName.toLowerCase()) &&
 								game.winner}
 							transition:scale={{ duration: 200, delay: index * 50 }}
+							on:click={() => {
+								if (game.gameId) {
+									goto(`/game/${game.gameId}`);
+								}
+							}}
+							on:keydown={(e) => {
+								if ((e.key === 'Enter' || e.key === ' ') && game.gameId) {
+									goto(`/game/${game.gameId}`);
+								}
+							}}
+							tabindex="0"
+							role="button"
 						>
 							<div class="game-header">
 								<div class="game-result">
@@ -166,6 +178,11 @@
 									<span class="score-label">Score:</span>
 									<span class="score-value">{game.score}</span>
 								</div>
+								{#if game.gameId}
+									<div class="click-indicator">
+										<i class="fa-solid fa-chevron-right"></i>
+									</div>
+								{/if}
 							</div>
 						</div>
 					{/each}
@@ -294,6 +311,21 @@
 		border-radius: 10px;
 		padding: 1.5rem;
 		border-left: 4px solid var(--primary-300);
+		transition: all 0.2s ease;
+
+		&.clickable {
+			cursor: pointer;
+
+			&:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+			}
+
+			&:focus {
+				outline: 2px solid var(--primary-500);
+				outline-offset: 2px;
+			}
+		}
 
 		&.victory {
 			border-left-color: #10b981;
@@ -346,7 +378,8 @@
 
 	.game-score {
 		display: flex;
-		justify-content: center;
+		justify-content: space-between;
+		align-items: center;
 	}
 
 	.score-display {
@@ -368,6 +401,17 @@
 			font-weight: bold;
 			font-family: 'Cinzel', serif;
 		}
+	}
+
+	.click-indicator {
+		color: var(--primary-400);
+		font-size: 1.2rem;
+		transition: transform 0.2s ease;
+	}
+
+	.game-card.clickable:hover .click-indicator {
+		transform: translateX(5px);
+		color: var(--primary-600);
 	}
 
 	.no-games {

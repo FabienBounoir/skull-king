@@ -6,12 +6,36 @@ import { error, json } from "@sveltejs/kit";
 /**
  * @type {import("./$types").RequestHandler}
  */
+export const GET = async ({ params, url }) => {
+	try {
+		const team = url.searchParams.get('team') || 'default';
+		const game = await gameService.get(params._id);
+		
+		if (!game) {
+			throw error(404, "Game not found");
+		}
+
+		// Verify the game belongs to the correct team
+		if (game.team !== team) {
+			throw error(404, "Game not found for this team");
+		}
+
+		return json(game);
+	} catch (e) {
+		console.error('Error fetching game:', e);
+		return json({ error: 'Internal server error' }, { status: 500 });
+	}
+};
+
+/**
+ * @type {import("./$types").RequestHandler}
+ */
 export const PUT = async ({ request, params }) => {
 	try {
 		const { score, team } = await request.json();
 
 		if (!team || !score) {
-			throw error(404, { id: "request.invalid", message: "Invalid request" });
+			throw error(404, "Invalid request");
 		}
 
 		const game = await gameService.update(params._id, score);
@@ -28,6 +52,7 @@ export const PUT = async ({ request, params }) => {
 		return json(game);
 	}
 	catch (e) {
-		return json({ error: e.message }, { status: 500 });
+		console.error('Error updating game:', e);
+		return json({ error: 'Internal server error' }, { status: 500 });
 	}
 };

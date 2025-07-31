@@ -121,7 +121,17 @@
 			{/each}
 		{:then games}
 			{#each games as game}
-				<div class="player">
+				<div 
+					class="player clickable"
+					on:click={() => goto(`/game/${game._id}`)}
+					on:keydown={(e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							goto(`/game/${game._id}`);
+						}
+					}}
+					tabindex="0"
+					role="button"
+				>
 					<p class:rainbow={['fabien', 'bouns', 'fab'].includes(game.winner.toLowerCase())}>
 						<span><i class="fa-solid fa-crown"></i> {game.winner}</span>
 					</p>
