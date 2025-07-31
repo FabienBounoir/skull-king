@@ -24,6 +24,7 @@
 	export let player = {};
 	export let index = 0;
 	export let bidsDisplay = true;
+	export let onTricksChange = null; // Callback pour notifier les changements
 
 	const updateBet = (number) => {
 		if (number < 0) {
@@ -67,9 +68,15 @@
 
 	<h3>Tricks won</h3>
 	<div class="bids" class:disable={!bidsDisplay && !player.alreadySaved}>
-		<button class:selected={player.winTurn == 0} on:click={() => (player.winTurn = 0)}>{0}</button>
+		<button class:selected={player.winTurn == 0} on:click={() => {
+			player.winTurn = 0;
+			onTricksChange && onTricksChange();
+		}}>{0}</button>
 		{#each Array.from({ length: index + 1 }) as _, i}
-			<button class:selected={player.winTurn == i + 1} on:click={() => (player.winTurn = i + 1)}
+			<button class:selected={player.winTurn == i + 1} on:click={() => {
+				player.winTurn = i + 1;
+				onTricksChange && onTricksChange();
+			}}
 				>{i + 1}</button
 			>
 		{/each}

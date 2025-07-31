@@ -49,6 +49,28 @@
 
 	let totalRound = 10;
 
+	// Fonction pour calculer le total des plis pris dans le round actuel
+	function getTotalTricksTaken(round) {
+		if (!round || !Array.isArray(round)) return 0;
+		return round.reduce((total, player) => total + (player.winTurn || 0), 0);
+	}
+
+	// Variable pour le nombre de plis annulés
+	let discardedTricks = 0;
+
+	// Variable pour forcer la mise à jour du compteur
+	let tricksUpdateTrigger = 0;	// Fonction appelée quand un joueur change ses plis
+	function onTricksChange() {
+		tricksUpdateTrigger++;
+	}
+
+	// Variables réactives pour le compteur de plis
+	$: currentRound = rounds[selectedRound];
+	$: totalTricks = currentRound ? getTotalTricksTaken(currentRound) + (tricksUpdateTrigger * 0) : 0;
+	$: expectedTricks = selectedRound + 1;
+	$: adjustedExpectedTricks = expectedTricks - discardedTricks;
+	$: isValidCount = totalTricks === adjustedExpectedTricks;
+
 	$: saveData(players, rounds, status, selectedRound);
 
 	function saveData(players, rounds, status, selectedRound) {
@@ -233,6 +255,7 @@
 
 		<div class="round">
 			<h1>Round {1 + selectedRound}</h1>
+			
 			<div class="button-container">
 				<button
 					class="add-player"
@@ -273,11 +296,44 @@
 		{#each rounds as round, index}
 			{#if index === selectedRound}
 				{#each round as player}
-					<PlayerProfile {player} {index} {bidsDisplay} />
+					<PlayerProfile {player} {index} {bidsDisplay} {onTricksChange} />
 				{/each}
 			{/if}
 		{/each}
+		
 		<div class="navigation">
+			<!-- Affichage compact du compteur de plis -->
+			{#if currentRound}
+				<div class="tricks-compact-info">
+					<div class="tricks-summary">
+						<span class="tricks-compact-count">
+							Plis: {totalTricks}/{adjustedExpectedTricks}
+						</span>
+						<span class="tricks-compact-details">
+							({expectedTricks} cartes - {discardedTricks} annulé{discardedTricks > 1 ? 's' : ''})
+						</span>
+					</div>
+					
+					<div class="tricks-compact-controls">
+						<span>Plis annulés :</span>
+						<div class="compact-controls">
+							<button 
+								class="compact-btn" 
+								on:click={() => discardedTricks = Math.max(0, discardedTricks - 1)}
+								disabled={discardedTricks === 0}
+							>-</button>
+							<span class="compact-count">{discardedTricks}</span>
+							<button 
+								class="compact-btn" 
+								on:click={() => discardedTricks = Math.min(expectedTricks, discardedTricks + 1)}
+								disabled={discardedTricks >= expectedTricks}
+							>+</button>
+						</div>
+					</div>
+				</div>
+			{/if}
+			
+			<div class="navigation-buttons">
 			{#if selectedRound < rounds.length - 1}
 				{#if selectedRound > 0}
 					<button
@@ -295,6 +351,8 @@
 				{/if}
 				<button
 					style="font-size: 1.5rem;"
+					class:invalid-round={!isValidCount && totalTricks > 0}
+					class:valid-round={isValidCount && totalTricks > 0}
 					on:click={() => {
 						if (rounds.length < totalRound) {
 							addNewRound();
@@ -311,6 +369,7 @@
 					{/if}
 				</button>
 			{/if}
+			</div>
 		</div>
 
 		{#if displayAnnouncement}
@@ -558,17 +617,25 @@
 
 	.navigation {
 		display: flex;
-		justify-content: center;
-		gap: 10px;
+		flex-direction: column;
+		gap: 15px;
 		position: sticky;
 		bottom: 0;
-		min-height: 50px;
-		padding: 10px 2.5vw 30px 2.5vw;
+		padding: 15px 2.5vw 30px 2.5vw;
 		margin: 10px 0 0 0;
 		backdrop-filter: blur(10px);
+		background-color: rgba(255, 255, 255, 0.1);
+		border-top: 1px solid var(--primary-300);
 	}
 
-	.navigation button {
+	.navigation-buttons {
+		display: flex;
+		justify-content: center;
+		gap: 10px;
+		min-height: 50px;
+	}
+
+	.navigation button, .navigation-buttons button {
 		background-color: var(--primary-500);
 		color: var(--primary-50);
 		padding: 10px 20px;
@@ -582,5 +649,95 @@
 		&:active {
 			transform: scale(1.1);
 		}
+		
+		&.invalid-round {
+			background-color: #dc2626;
+			color: white;
+		}
+		
+		&.valid-round {
+			background-color: #16a34a;
+			color: white;
+		}
 	}
+
+	.tricks-compact-info {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding: 15px;
+		border-radius: 8px;
+		background-color: var(--primary-100);
+		border: 1px solid var(--primary-300);
+		
+		.tricks-summary {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			
+			.tricks-compact-count {
+				font-weight: bold;
+				font-size: 1rem;
+				color: var(--primary-900);
+			}
+			
+			.tricks-compact-details {
+				font-size: 0.8rem;
+				color: var(--primary-700);
+				font-style: italic;
+			}
+		}
+		
+		.tricks-compact-controls {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			
+			span {
+				font-size: 0.9rem;
+				color: var(--primary-800);
+				font-weight: 500;
+			}
+			
+			.compact-controls {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				
+				.compact-btn {
+					background-color: var(--primary-500);
+					color: var(--primary-50);
+					border: none;
+					border-radius: 4px;
+					width: 25px;
+					height: 25px;
+					font-size: 1rem;
+					font-weight: bold;
+					cursor: pointer;
+					transition: all 0.2s;
+					
+					&:hover:not(:disabled) {
+						background-color: var(--primary-600);
+						transform: scale(1.05);
+					}
+					
+					&:disabled {
+						background-color: var(--primary-300);
+						cursor: not-allowed;
+						opacity: 0.6;
+					}
+				}
+				
+				.compact-count {
+					font-weight: bold;
+					font-size: 1rem;
+					color: var(--primary-900);
+					min-width: 20px;
+					text-align: center;
+				}
+			}
+		}
+	}
+
+
 </style>
