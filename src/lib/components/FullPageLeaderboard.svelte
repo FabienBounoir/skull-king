@@ -106,7 +106,7 @@
 			>
 				<p>
 					<span>{top[index] || index + 1}</span>{player}
-					{#if player == 'Nadir' && index == scores.length - 1}
+					{#if index == scores.length - 1}
 						💩
 					{/if}
 					{#if player == 'Cynthia'}
